@@ -1,102 +1,98 @@
 <template>
   <div class="home">
+    <!-- 英雄区域 -->
     <div class="hero">
-      <h1 v-if="currentUser">欢迎回来, {{ currentUser.name }}!</h1>
-      <h1 v-else>欢迎来到GF职业空间</h1>
-      <p v-if="currentUser">继续记录您的职业成长足迹，规划未来发展路径</p>
-      <p v-else>记录您的职业成长足迹，规划未来发展路径</p>
-      <el-button type="primary" size="large" @click="goToMilestones">开始记录</el-button>
+      <h1>欢迎来到职业空间</h1>
+      <p>记录和展示您的职业发展历程，规划未来方向</p>
     </div>
     
+    <!-- 功能卡片 -->
     <div class="features">
       <el-row :gutter="20">
-        <el-col :span="6">
-          <div class="feature-card" @click="goToMilestones">
-            <div class="feature-icon">
-              <el-icon><Document /></el-icon>
-            </div>
-            <h3>历程记录</h3>
-            <p>记录入职培训、转正、晋升等重要时刻</p>
+      <el-col :span="6">
+        <div class="feature-card" @click="goToMilestones">
+          <div class="feature-icon">
+            <el-icon><Document /></el-icon>
           </div>
-        </el-col>
-        <el-col :span="6">
-          <div class="feature-card" @click="goToCertificates">
-            <div class="feature-icon">
-              <el-icon><Medal /></el-icon>
-            </div>
-            <h3>证书管理</h3>
-            <p>管理各类证明文件和荣誉证书</p>
+          <h3>历程记录</h3>
+          <p>记录入职培训、转正、晋升等重要时刻</p>
+        </div>
+      </el-col>
+      <el-col :span="6">
+        <div class="feature-card" @click="goToCertificates">
+          <div class="feature-icon">
+            <el-icon><Medal /></el-icon>
           </div>
-        </el-col>
-        <el-col :span="6">
-          <div class="feature-card" @click="goToAI">
-            <div class="feature-icon">
-              <el-icon><Lightning /></el-icon>
-            </div>
-            <h3>智能助手</h3>
-            <p>AI驱动的职业发展建议和学习路径</p>
+          <h3>证书管理</h3>
+          <p>管理各类证明文件和荣誉证书</p>
+        </div>
+      </el-col>
+      <el-col :span="6">
+        <div class="feature-card" @click="goToAI">
+          <div class="feature-icon">
+            <el-icon><Lightning /></el-icon>
           </div>
-        </el-col>
-        <el-col :span="6">
-          <div class="feature-card" @click="goToCareerPlans">
-            <div class="feature-icon">
-              <el-icon><TrendCharts /></el-icon>
-            </div>
-            <h3>职业规划</h3>
-            <p>制定和跟踪您的职业发展计划</p>
+          <h3>智能助手</h3>
+          <p>AI驱动的职业发展建议和学习路径</p>
+        </div>
+      </el-col>
+      <el-col :span="6">
+        <div class="feature-card" @click="goToCareerPlans">
+          <div class="feature-icon">
+            <el-icon><TrendCharts /></el-icon>
           </div>
-        </el-col>
+          <h3>职业规划</h3>
+          <p>制定和跟踪您的职业发展计划</p>
+        </div>
+      </el-col>
       </el-row>
     </div>
     
+    <!-- 统计数据 -->
     <div class="stats">
       <el-row :gutter="20">
-        <el-col :span="6">
+        <el-col :span="6" :xs="12">
           <div class="stat-item">
             <div class="stat-number">{{ statistics.milestoneCount }}</div>
-            <div class="stat-label">我的里程碑</div>
+            <div class="stat-label">里程碑</div>
           </div>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="6" :xs="12">
           <div class="stat-item">
             <div class="stat-number">{{ statistics.certificateCount }}</div>
-            <div class="stat-label">我的证书</div>
+            <div class="stat-label">证书</div>
           </div>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="6" :xs="12">
+          <div class="stat-item">
+            <div class="stat-number">{{ statistics.skillCount }}</div>
+            <div class="stat-label">技能</div>
+          </div>
+        </el-col>
+        <el-col :span="6" :xs="12">
           <div class="stat-item">
             <div class="stat-number">{{ statistics.satisfactionRate }}%</div>
             <div class="stat-label">满意度</div>
           </div>
         </el-col>
-        <el-col :span="6">
-          <div class="stat-item">
-            <div class="stat-number">{{ statistics.skillCount || 0 }}</div>
-            <div class="stat-label">技能数量</div>
-          </div>
-        </el-col>
       </el-row>
     </div>
     
-    <!-- 数据分析图表 -->
+    <!-- 图表区域 -->
     <div class="charts-section">
       <el-row :gutter="20">
-        <el-col :span="12">
+        <el-col :span="12" :xs="24">
           <el-card class="chart-card">
             <template #header>
-              <div class="chart-header">
-                <span>里程碑类型分布</span>
-              </div>
+              <div class="chart-header">里程碑类型分布</div>
             </template>
             <div ref="milestoneChart" class="chart-container"></div>
           </el-card>
         </el-col>
-        <el-col :span="12">
+        <el-col :span="12" :xs="24">
           <el-card class="chart-card">
             <template #header>
-              <div class="chart-header">
-                <span>证书类型统计</span>
-              </div>
+              <div class="chart-header">证书类型统计</div>
             </template>
             <div ref="certificateChart" class="chart-container"></div>
           </el-card>
@@ -129,6 +125,17 @@
             </el-card>
           </el-timeline-item>
         </el-timeline>
+        <!-- 分页控件 -->
+        <div class="pagination-container" v-if="totalActivities > pageSize">
+          <el-pagination
+            @current-change="handlePageChange"
+            :current-page="currentPage"
+            :page-size="pageSize"
+            :total="totalActivities"
+            layout="prev, pager, next"
+            background
+          />
+        </div>
       </el-card>
     </div>
   </div>
@@ -165,6 +172,11 @@ export default {
     const certificateChart = ref(null)
     let milestoneChartInstance = null
     let certificateChartInstance = null
+    
+    // 分页相关
+    const currentPage = ref(1)
+    const pageSize = ref(10)
+    const totalActivities = ref(0)
 
     const goToMilestones = () => {
       router.push('/milestones')
@@ -197,13 +209,19 @@ export default {
       }
     }
     
-    const loadRecentActivities = async () => {
+    const loadRecentActivities = async (page = 1) => {
       try {
-        const response = await getRecentActivities()
-        recentActivities.value = response.data
+        const response = await getRecentActivities(page - 1, pageSize.value)
+        recentActivities.value = response.data.activities || response.data
+        totalActivities.value = response.data.total || (response.data.activities ? response.data.activities.length : response.data.length) * 10 // 估算总数量
       } catch (error) {
         ElMessage.error('加载最近活动失败')
       }
+    }
+    
+    const handlePageChange = (page) => {
+      currentPage.value = page
+      loadRecentActivities(page)
     }
     
     const loadCharts = () => {
@@ -295,8 +313,32 @@ export default {
     
     const formatDate = (dateString) => {
       if (!dateString) return ''
-      const date = new Date(dateString)
-      return date.toLocaleDateString('zh-CN')
+      // 处理不同的日期格式
+      let date
+      if (typeof dateString === 'string') {
+        // 处理 "yyyy-MM-dd HH:mm:ss" 格式
+        if (dateString.includes(' ')) {
+          const [datePart, timePart] = dateString.split(' ')
+          const [year, month, day] = datePart.split('-')
+          const [hour, minute, second] = timePart.split(':')
+          date = new Date(year, month - 1, day, hour, minute, second)
+        } else {
+          // 处理 ISO 格式或其他标准格式
+          date = new Date(dateString)
+        }
+      } else {
+        // 处理已经是 Date 对象的情况
+        date = new Date(dateString)
+      }
+      
+      // 格式化为 "yyyy年MM月dd日 HH:mm"
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      
+      return `${year}年${month}月${day}日 ${hours}:${minutes}`
     }
 
     onMounted(() => {
@@ -331,7 +373,12 @@ export default {
       goToAI,
       goToCareerPlans,
       getActivityType,
-      formatDate
+      formatDate,
+      // 分页相关
+      currentPage,
+      pageSize,
+      totalActivities,
+      handlePageChange
     }
   }
 }
@@ -387,12 +434,19 @@ export default {
 .feature-icon {
   font-size: 48px;
   color: #ff6b35;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .feature-card h3 {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   color: #333;
+  font-size: 18px;
+}
+
+.feature-card p {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
 }
 
 .stats {
@@ -469,6 +523,13 @@ export default {
   font-size: 14px;
   color: #999;
   font-weight: normal;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  padding: 20px 0;
 }
 
 /* 响应式设计 */

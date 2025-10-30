@@ -234,7 +234,12 @@ export default {
       try {
         if (currentUser.value && currentUser.value.id) {
           const response = await getMilestonesByEmployeeId(currentUser.value.id)
-          milestones.value = response.data
+          // 按事件日期倒序排列（最新的在前面）
+          milestones.value = response.data.sort((a, b) => {
+            const dateA = new Date(a.eventDate)
+            const dateB = new Date(b.eventDate)
+            return dateB - dateA
+          })
         }
       } catch (error) {
         ElMessage.error('加载里程碑失败: ' + (error.response?.data?.message || error.message || '未知错误'))

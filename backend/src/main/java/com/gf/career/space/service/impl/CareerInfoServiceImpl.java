@@ -149,17 +149,20 @@ public class CareerInfoServiceImpl implements CareerInfoService {
     }
     
     @Override
-    public List<Map<String, Object>> getRecentActivities() {
-        // 获取最近的里程碑活动（最多20条）
+    public List<Map<String, Object>> getRecentActivities(int page, int size) {
+        // 限制每页大小不超过50
+        size = Math.min(size, 50);
+        
+        // 获取最近的里程碑活动（最多page*size+size条）
         List<Milestone> recentMilestones = milestoneService.lambdaQuery()
             .orderByDesc(Milestone::getCreateTime)
-            .last("LIMIT 20")
+            .last("LIMIT " + (page * size + size))
             .list();
             
-        // 获取最近的证书活动（最多20条）
+        // 获取最近的证书活动（最多page*size+size条）
         List<Certificate> recentCertificates = certificateService.lambdaQuery()
             .orderByDesc(Certificate::getCreateTime)
-            .last("LIMIT 20")
+            .last("LIMIT " + (page * size + size))
             .list();
             
         // 合并并排序所有活动
@@ -203,14 +206,111 @@ public class CareerInfoServiceImpl implements CareerInfoService {
             allActivities.add(activity);
         }
         
-        // 按创建时间排序，取最新的10条记录
-        return allActivities.stream()
+        // 按创建时间排序
+        List<Map<String, Object>> sortedActivities = allActivities.stream()
             .sorted((a, b) -> {
                 LocalDateTime timeA = (LocalDateTime) a.get("createTime");
                 LocalDateTime timeB = (LocalDateTime) b.get("createTime");
                 return timeB.compareTo(timeA); // 降序排列
             })
-            .limit(10)
             .collect(Collectors.toList());
+        
+        // 分页处理
+        int fromIndex = page * size;
+        int toIndex = Math.min(fromIndex + size, sortedActivities.size());
+        
+        // 确保索引有效
+        if (fromIndex >= sortedActivities.size()) {
+            return new ArrayList<>(); // 返回空列表
+        }
+        
+        return sortedActivities.subList(fromIndex, toIndex);
+    }
+    
+    @Override
+    public Map<String, Object> getRecentActivitiesWithPagination(int page, int size) {
+        // 限制每页大小不超过50
+        size = Math.min(size, 50);
+        
+        // 获取所有里程碑和证书活动
+        List<Milestone> allMilestones = milestoneService.lambdaQuery()
+            .orderByDesc(Milestone::getCreateTime)
+            .list();
+            
+        List<Certificate> allCertificates = certificateService.lambdaQuery()
+            .orderByDesc(Certificate::getCreateTime)
+            .list();
+            
+        // 合并并排序所有活动
+        List<Map<String, Object>> allActivities = new ArrayList<>();
+        
+        // 处理里程碑活动
+        for (Milestone milestone : allMilestones) {
+            Map<String, Object> activity = new HashMap<>();
+            activity.put("id", milestone.getId());
+            activity.put("title", milestone.getTitle());
+            activity.put("description", milestone.getDescription());
+            activity.put("type", "里程碑");
+            activity.put("createTime", milestone.getCreateTime().toString()); // 转换为字符串
+            
+            // 获取员工信息
+            Employee employee = employeeService.getById(milestone.getEmployeeId());
+            if (employee != null) {
+                activity.put("employeeName", employee.getName());
+                activity.put("employeeId", employee.getId());
+            }
+            
+            allActivities.add(activity);
+        }
+        
+        // 处理证书活动
+        for (Certificate certificate : allCertificates) {
+            Map<String, Object> activity = new HashMap<>();
+            activity.put("id", certificate.getId());
+            activity.put("title", certificate.getTitle());
+            activity.put("description", certificate.getDescription());
+            activity.put("type", "证书");
+            activity.put("createTime", certificate.getCreateTime().toString()); // 转换为字符串
+            
+            // 获取员工信息
+            Employee employee = employeeService.getById(certificate.getEmployeeId());
+            if (employee != null) {
+                activity.put("employeeName", employee.getName());
+                activity.put("employeeId", employee.getId());
+            }
+            
+            allActivities.add(activity);
+        }
+        
+        // 按创建时间排序
+        List<Map<String, Object>> sortedActivities = allActivities.stream()
+            .sorted((a, b) -> {
+                String timeA = (String) a.get("createTime");
+                String timeB = (String) b.get("createTime");
+                return timeB.compareTo(timeA); // 降序排列
+            })
+            .collect(Collectors.toList());
+        
+        // 获取总数量
+        int total = sortedActivities.size();
+        
+        // 分页处理
+        int fromIndex = page * size;
+        int toIndex = Math.min(fromIndex + size, sortedActivities.size());
+        
+        // 确保索引有效
+        List<Map<String, Object>> paginatedActivities = new ArrayList<>();
+        if (fromIndex < sortedActivities.size()) {
+            paginatedActivities = sortedActivities.subList(fromIndex, toIndex);
+        }
+        
+        // 构造返回结果
+        Map<String, Object> result = new HashMap<>();
+        result.put("activities", paginatedActivities);
+        result.put("total", total);
+        result.put("page", page);
+        result.put("size", size);
+        
+        return result;
     }
 }

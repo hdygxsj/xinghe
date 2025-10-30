@@ -56,10 +56,14 @@ public interface CareerInfoService {
      * @return 统计信息Map
      */
     Map<String, Object> getStatisticsByEmployeeId(Long employeeId);
-    
+
+    List<Map<String, Object>> getRecentActivities(int page, int size);
+
     /**
-     * 获取最近活动
-     * @return 最近活动列表
+     * 获取最近活动（支持分页）
+     * @param page 页码（从0开始）
+     * @param size 每页大小
+     * @return 包含活动列表和总数量的Map
      */
-    List<Map<String, Object>> getRecentActivities();
+    Map<String, Object> getRecentActivitiesWithPagination(int page, int size);
 }

@@ -94,9 +94,11 @@ public class CareerInfoController {
     }
     
     @GetMapping("/recent-activities")
-    public List<Map<String, Object>> getRecentActivities() {
+    public Map<String, Object> getRecentActivities(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size) {
         // 获取最近的里程碑和证书活动
-        return careerInfoService.getRecentActivities();
+        return careerInfoService.getRecentActivitiesWithPagination(page, size);
     }
     
     /**
