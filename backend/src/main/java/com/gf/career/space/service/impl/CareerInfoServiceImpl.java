@@ -175,7 +175,7 @@ public class CareerInfoServiceImpl implements CareerInfoService {
             activity.put("title", milestone.getTitle());
             activity.put("description", milestone.getDescription());
             activity.put("type", "里程碑");
-            activity.put("createTime", milestone.getCreateTime());
+            activity.put("createTime", milestone.getEventDate());
             
             // 获取员工信息
             Employee employee = employeeService.getById(milestone.getEmployeeId());
@@ -194,7 +194,7 @@ public class CareerInfoServiceImpl implements CareerInfoService {
             activity.put("title", certificate.getTitle());
             activity.put("description", certificate.getDescription());
             activity.put("type", "证书");
-            activity.put("createTime", certificate.getCreateTime());
+            activity.put("createTime", certificate.getIssueDate());
             
             // 获取员工信息
             Employee employee = employeeService.getById(certificate.getEmployeeId());
@@ -251,7 +251,7 @@ public class CareerInfoServiceImpl implements CareerInfoService {
             activity.put("title", milestone.getTitle());
             activity.put("description", milestone.getDescription());
             activity.put("type", "里程碑");
-            activity.put("createTime", milestone.getCreateTime().toString()); // 转换为字符串
+            activity.put("createTime", milestone.getEventDate());
             
             // 获取员工信息
             Employee employee = employeeService.getById(milestone.getEmployeeId());
@@ -270,7 +270,7 @@ public class CareerInfoServiceImpl implements CareerInfoService {
             activity.put("title", certificate.getTitle());
             activity.put("description", certificate.getDescription());
             activity.put("type", "证书");
-            activity.put("createTime", certificate.getCreateTime().toString()); // 转换为字符串
+            activity.put("createTime", certificate.getIssueDate()); // 转换为字符串
             
             // 获取员工信息
             Employee employee = employeeService.getById(certificate.getEmployeeId());
@@ -285,8 +285,8 @@ public class CareerInfoServiceImpl implements CareerInfoService {
         // 按创建时间排序
         List<Map<String, Object>> sortedActivities = allActivities.stream()
             .sorted((a, b) -> {
-                String timeA = (String) a.get("createTime");
-                String timeB = (String) b.get("createTime");
+                LocalDateTime timeA = (LocalDateTime) a.get("createTime");
+                LocalDateTime timeB = (LocalDateTime) b.get("createTime");
                 return timeB.compareTo(timeA); // 降序排列
             })
             .collect(Collectors.toList());

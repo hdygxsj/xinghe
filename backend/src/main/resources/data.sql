@@ -27,14 +27,17 @@ INSERT INTO mentor (name, department, position, expertise, email, phone) VALUES
 ('孙七', '市场部', '市场总监', '市场营销,品牌推广', 'sunqi@company.com', '13800138005'),
 ('周八', '人事部', 'HR经理', '人力资源管理,员工培训', 'zhouba@company.com', '13800138006');
 
--- 初始化技能数据
-INSERT INTO skill (name, category, description, level) VALUES
-('Java编程', '技术', 'Java语言编程技能', 5),
-('Spring框架', '技术', 'Spring框架使用经验', 4),
-('数据库设计', '技术', '数据库设计与优化', 4),
-('项目管理', '管理', '项目规划与执行管理', 3),
-('团队协作', '沟通', '团队合作与协调能力', 5),
-('沟通表达', '沟通', '清晰表达与沟通技巧', 4);
+-- 初始化技能数据（使用H2兼容的MERGE语法）
+MERGE INTO skill KEY(id) VALUES (1, 'Java编程', '技术技能', 'Java编程语言的掌握程度', 3, NOW(), NOW());
+MERGE INTO skill KEY(id) VALUES (2, '项目管理', '软技能', '项目规划、执行和监控的能力', 4, NOW(), NOW());
+MERGE INTO skill KEY(id) VALUES (3, '数据分析', '技术技能', '使用统计方法和工具分析数据的能力', 2, NOW(), NOW());
+MERGE INTO skill KEY(id) VALUES (4, '沟通能力', '软技能', '有效沟通和表达的能力', 5, NOW(), NOW());
+MERGE INTO skill KEY(id) VALUES (5, '团队协作', '软技能', '在团队中有效合作的能力', 4, NOW(), NOW());
+MERGE INTO skill KEY(id) VALUES (6, '英语能力', '语言技能', '英语听说读写能力', 3, NOW(), NOW());
+MERGE INTO skill KEY(id) VALUES (7, '产品设计', '技术技能', '产品设计和用户体验设计能力', 3, NOW(), NOW());
+MERGE INTO skill KEY(id) VALUES (8, '领导力', '软技能', '带领团队和影响他人的能力', 3, NOW(), NOW());
+MERGE INTO skill KEY(id) VALUES (9, '财务分析', '专业技能', '财务报表分析和财务规划能力', 2, NOW(), NOW());
+MERGE INTO skill KEY(id) VALUES (10, '市场营销', '专业技能', '市场调研和营销策略制定能力', 3, NOW(), NOW());
 
 -- 初始化员工技能数据
 INSERT INTO employee_skill (employee_id, skill_id, proficiency_level, acquired_date) VALUES

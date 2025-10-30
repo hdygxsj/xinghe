@@ -257,11 +257,11 @@ export default {
               type: 'pie',
               radius: '50%',
               data: [
-                { value: statistics.value.milestoneCount * 0.3, name: '入职培训' },
-                { value: statistics.value.milestoneCount * 0.2, name: '转正' },
-                { value: statistics.value.milestoneCount * 0.2, name: '职位晋升' },
-                { value: statistics.value.milestoneCount * 0.15, name: '参赛荣誉' },
-                { value: statistics.value.milestoneCount * 0.15, name: '重大项目' }
+                { value: Math.round(statistics.value.milestoneCount * 0.3), name: '入职培训' },
+                { value: Math.round(statistics.value.milestoneCount * 0.2), name: '转正' },
+                { value: Math.round(statistics.value.milestoneCount * 0.2), name: '职位晋升' },
+                { value: Math.round(statistics.value.milestoneCount * 0.15), name: '参赛荣誉' },
+                { value: Math.round(statistics.value.milestoneCount * 0.15), name: '重大项目' }
               ],
               emphasis: {
                 itemStyle: {
@@ -297,9 +297,9 @@ export default {
           series: [
             {
               data: [
-                statistics.value.certificateCount * 0.4,
-                statistics.value.certificateCount * 0.3,
-                statistics.value.certificateCount * 0.3
+                Math.round(statistics.value.certificateCount * 0.4),
+                Math.round(statistics.value.certificateCount * 0.3),
+                Math.round(statistics.value.certificateCount * 0.3)
               ],
               type: 'bar',
               itemStyle: {
@@ -327,18 +327,21 @@ export default {
             tooltip: {},
             radar: {
               indicator: [
-                { name: '技术技能', max: 10 },
-                { name: '软技能', max: 10 },
-                { name: '专业技能', max: 10 },
-                { name: '语言技能', max: 10 },
-                { name: '管理技能', max: 10 }
+                { name: '技术技能', max: 3 },
+                { name: '软技能', max: 3 },
+                { name: '专业技能', max: 3 },
+                { name: '语言技能', max: 3 },
+                { name: '管理技能', max: 3 },
+                { name: '协同技能', max: 3 },
               ],
-              radius: '65%',
+              radius: '55%',
               center: ['50%', '55%'],
-              splitNumber: 4,
-              axisName: {
-                color: '#666',
-                fontSize: 12
+              splitNumber: 6,
+              name: {
+                textStyle: {
+                  color: '#666',
+                  fontSize: 12
+                }
               },
               splitLine: {
                 lineStyle: {
@@ -349,7 +352,7 @@ export default {
               splitArea: {
                 show: true,
                 areaStyle: {
-                  color: ['rgba(255, 255, 255, 0.9)', 'rgba(245, 245, 245, 0.9)']
+                  color: ['rgba(250, 250, 250, 0.8)', 'rgba(230, 230, 230, 0.8)']
                 }
               },
               axisLine: {
@@ -367,7 +370,8 @@ export default {
                   skillStats.skillTypeCount['软技能'] || 0,
                   skillStats.skillTypeCount['专业技能'] || 0,
                   skillStats.skillTypeCount['语言技能'] || 0,
-                  skillStats.skillTypeCount['管理技能'] || 0
+                  skillStats.skillTypeCount['管理技能'] || 0,
+                  skillStats.skillTypeCount['协同技能'] || 0
                 ],
                 name: '技能评分',
                 symbol: 'circle',
@@ -400,18 +404,21 @@ export default {
             tooltip: {},
             radar: {
               indicator: [
-                { name: '技术技能', max: 10 },
-                { name: '软技能', max: 10 },
-                { name: '专业技能', max: 10 },
-                { name: '语言技能', max: 10 },
-                { name: '管理技能', max: 10 }
+                { name: '技术技能', max: 3 },
+                { name: '软技能', max: 3 },
+                { name: '专业技能', max: 3 },
+                { name: '语言技能', max: 3 },
+                { name: '管理技能', max: 3 },
+                { name: '协同技能', max: 3 }
               ],
               radius: '60%',
               center: ['50%', '55%'],
               splitNumber: 5,
-              axisName: {
-                color: '#666',
-                fontSize: 12
+              name: {
+                textStyle: {
+                  color: '#666',
+                  fontSize: 12
+                }
               },
               splitLine: {
                 lineStyle: {
