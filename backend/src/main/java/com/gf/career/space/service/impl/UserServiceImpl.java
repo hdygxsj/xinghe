@@ -5,8 +5,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gf.career.space.entity.Employee;
 import com.gf.career.space.mapper.EmployeeMapper;
 import com.gf.career.space.service.UserService;
+import com.gf.career.space.util.SM3PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,7 @@ public class UserServiceImpl extends ServiceImpl<EmployeeMapper, Employee> imple
     @Autowired
     private EmployeeMapper employeeMapper;
 
-    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private PasswordEncoder passwordEncoder = new SM3PasswordEncoder();
 
     @Override
     public Employee register(Employee employee) throws Exception {
@@ -42,17 +42,35 @@ public class UserServiceImpl extends ServiceImpl<EmployeeMapper, Employee> imple
         queryWrapper.eq("username", username);
         Employee employee = employeeMapper.selectOne(queryWrapper);
         
+        System.out.println("Login attempt - Username: " + username);
+        System.out.println("Employee found: " + (employee != null));
+        
         if (employee == null) {
             throw new Exception("User not found");
         }
         
+        System.out.println("Stored password hash: " + employee.getPassword());
+        System.out.println("Provided password: " + password);
+        
         // Check password
-        if (!passwordEncoder.matches(password, employee.getPassword())) {
+        boolean passwordMatches = passwordEncoder.matches(password, employee.getPassword());
+        System.out.println("Password matches: " + passwordMatches);
+        
+        if (!passwordMatches) {
             throw new Exception("Invalid password");
         }
         
-        // Return employee without password
-        employee.setPassword(null);
-        return employee;
+        // Create a copy of employee without password for return
+        Employee employeeWithoutPassword = new Employee();
+        employeeWithoutPassword.setId(employee.getId());
+        employeeWithoutPassword.setUsername(employee.getUsername());
+        employeeWithoutPassword.setName(employee.getName());
+        employeeWithoutPassword.setDepartment(employee.getDepartment());
+        employeeWithoutPassword.setPosition(employee.getPosition());
+        employeeWithoutPassword.setEmail(employee.getEmail());
+        employeeWithoutPassword.setPhone(employee.getPhone());
+        employeeWithoutPassword.setHireDate(employee.getHireDate());
+        
+        return employeeWithoutPassword;
     }
 }

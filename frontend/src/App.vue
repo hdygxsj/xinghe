@@ -36,6 +36,7 @@
 <script>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
 
 export default {
   name: 'App',
@@ -74,8 +75,11 @@ export default {
 
     const handleLogout = () => {
       localStorage.removeItem('currentUser')
+      localStorage.removeItem('token')
       currentUser.value = null
       isLoggedIn.value = false
+      // 移除axios默认头部的Authorization
+      delete axios.defaults.headers.common['Authorization']
       router.push('/login')
     }
 
@@ -90,9 +94,13 @@ export default {
     const checkLoginStatus = () => {
       // Check if user is already logged in
       const user = localStorage.getItem('currentUser')
-      if (user) {
+      const token = localStorage.getItem('token')
+      
+      if (user && token) {
         currentUser.value = JSON.parse(user)
         isLoggedIn.value = true
+        // 设置axios默认头部的Authorization
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
       }
     }
 
@@ -103,7 +111,7 @@ export default {
       router.beforeEach((to, from, next) => {
         const publicPages = ['/login', '/register']
         const authRequired = !publicPages.includes(to.path)
-        const loggedIn = localStorage.getItem('currentUser')
+        const loggedIn = localStorage.getItem('currentUser') && localStorage.getItem('token')
 
         if (authRequired && !loggedIn) {
           return next('/login')

@@ -119,11 +119,12 @@ export default {
           try {
             loading.value = true
             const response = await login(loginForm)
-            const { success, message, data } = response.data
+            const { success, message, data, token } = response.data
             
             if (success) {
-              // 保存用户信息到本地存储
+              // 保存用户信息和token到本地存储
               localStorage.setItem('currentUser', JSON.stringify(data))
+              localStorage.setItem('token', token)
               ElMessage.success('登录成功')
               // 跳转到首页
               router.push('/')
