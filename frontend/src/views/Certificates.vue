@@ -261,11 +261,20 @@ export default {
     
     const viewCertificate = async (certificate) => {
       selectedCertificate.value = certificate
-      previewLoading.value = true
       previewError.value = false
-      // 使用后端API的完整地址
-      certificateViewUrl.value = `http://localhost:8080/certificates/${certificate.id}/view`
+      // 使用后端API的完整地址，加时间戳强制重新加载
+      const timestamp = new Date().getTime()
+      certificateViewUrl.value = `http://localhost:8080/certificates/${certificate.id}/view?t=${timestamp}`
       viewDialogVisible.value = true
+      // 设置超时，防止长时间转圈
+      previewLoading.value = true
+      setTimeout(() => {
+        if (previewLoading.value) {
+          previewLoading.value = false
+          previewError.value = true
+          ElMessage.error('证书加载超时，请检查网络连接')
+        }
+      }, 10000)
     }
     
     const handleIframeLoad = () => {
@@ -448,14 +457,18 @@ export default {
 .certificate-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 15px;
-  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 15px;
+  align-items: center;
 }
 
 .certificate-footer .el-button {
-  flex: 1;
-  min-width: 60px;
+  padding: 6px 12px;
+  font-size: 12px;
+  height: 28px;
+  line-height: 28px;
+  white-space: nowrap;
 }
 
 .certificate-preview {
