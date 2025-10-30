@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${certificate.title}">证书</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'SimHei', 'Arial', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        
+        .certificate-container {
+            width: 210mm;
+            height: 297mm;
+            margin: 0 auto;
+            background: white;
+            position: relative;
+            box-sizing: border-box;
+            padding: 30mm 20mm;
+        }
+        
+        .certificate-header {
+            text-align: center;
+            margin-bottom: 20mm;
+        }
+        
+        .certificate-title {
+            font-size: 32pt;
+            font-weight: bold;
+            color: #d32f2f;
+            margin: 0 0 5mm 0;
+        }
+        
+        .certificate-subtitle {
+            font-size: 18pt;
+            color: #d32f2f;
+            margin: 0;
+        }
+        
+        .certificate-content {
+            text-align: center;
+            margin: 15mm 0;
+        }
+        
+        .certificate-label {
+            font-size: 14pt;
+            color: #666;
+        }
+        
+        .recipient-name {
+            font-size: 28pt;
+            font-weight: bold;
+            color: #d32f2f;
+            margin: 10mm 0;
+        }
+        
+        .certificate-text {
+            font-size: 16pt;
+            line-height: 1.8;
+            margin: 15mm 0;
+            text-align: justify;
+            padding: 0 20mm;
+        }
+        
+        .certificate-details {
+            display: table;
+            width: 100%;
+            margin: 20mm 0;
+        }
+        
+        .detail-row {
+            display: table-row;
+        }
+        
+        .detail-label, .detail-value {
+            display: table-cell;
+            padding: 3mm 5mm;
+            border-bottom: 1pt solid #eee;
+        }
+        
+        .detail-label {
+            font-size: 14pt;
+            color: #666;
+            width: 30%;
+        }
+        
+        .detail-value {
+            font-size: 14pt;
+            font-weight: bold;
+        }
+        
+        .certificate-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 25mm;
+        }
+        
+        .issuer-info {
+            font-size: 14pt;
+        }
+        
+        .issuer-name {
+            font-weight: bold;
+            margin-bottom: 2mm;
+        }
+        
+        .issue-date {
+            color: #666;
+        }
+        
+        .certificate-seal {
+            width: 80pt;
+            height: 80pt;
+            border: 2pt solid #d32f2f;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12pt;
+            font-weight: bold;
+            color: #d32f2f;
+            text-align: center;
+            padding: 5pt;
+        }
+        
+        .certificate-id {
+            text-align: center;
+            font-size: 12pt;
+            color: #999;
+            margin-top: 15mm;
+            padding-top: 5mm;
+            border-top: 1pt dashed #ccc;
+        }
+        
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 80pt;
+            font-weight: bold;
+            color: rgba(211, 47, 47, 0.05);
+            pointer-events: none;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="certificate-container">
+        <div class="watermark">GF职业空间</div>
+        
+        <div class="certificate-header">
+            <div class="certificate-title" th:text="${certificate.title}">证书标题</div>
+            <div class="certificate-subtitle" th:text="${certificate.certificateType}">证书类型</div>
+        </div>
+        
+        <div class="certificate-content">
+            <div class="certificate-label">兹证明</div>
+            <div class="recipient-name" th:text="${employeeName}">员工姓名</div>
+        </div>
+        
+        <div class="certificate-text" th:text="${certificate.description}">证书描述内容</div>
+        
+        <div class="certificate-details">
+            <div class="detail-row">
+                <div class="detail-label">证书编号:</div>
+                <div class="detail-value" th:text="${certificate.id}">001</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">颁发日期:</div>
+                <div class="detail-value" th:text="${#temporals.format(certificate.issueDate, 'yyyy年MM月dd日')}">2023年01月01日</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">证书类型:</div>
+                <div class="detail-value" th:text="${certificate.certificateType}">证书类型</div>
+            </div>
+        </div>
+        
+        <div class="certificate-footer">
+            <div class="issuer-info">
+                <div class="issuer-name" th:text="${certificate.issuer}">颁发机构</div>
+                <div class="issue-date">颁发日期: <span th:text="${#temporals.format(certificate.issueDate, 'yyyy年MM月dd日')}">2023年01月01日</span></div>
+            </div>
+            <div class="certificate-seal">
+                GF职业空间<br>认证 seal
+            </div>
+        </div>
+        
+        <div class="certificate-id">
+            证书ID: <span th:text="${certificate.id}">001</span> | 
+            验证码: <span th:text="${verificationCode}">ABC123</span>
+        </div>
+    </div>
+</body>
+</html>

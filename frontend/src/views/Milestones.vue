@@ -97,6 +97,7 @@ export default {
     const dialogTitle = ref('')
     const currentMilestone = ref({
       id: null,
+      employeeId: 1, // 默认员工ID为1
       title: '',
       description: '',
       type: '',
@@ -119,6 +120,7 @@ export default {
       dialogTitle.value = '添加里程碑'
       currentMilestone.value = {
         id: null,
+        employeeId: 1, // 默认员工ID为1
         title: '',
         description: '',
         type: '',
@@ -137,17 +139,35 @@ export default {
     
     const saveMilestone = async () => {
       try {
-        if (isEditing.value) {
-          await updateMilestone(currentMilestone.value.id, currentMilestone.value)
-          ElMessage.success('更新成功')
-        } else {
-          await createMilestone(currentMilestone.value)
-          ElMessage.success('创建成功')
+        // 确保传递正确的数据格式
+        const milestoneData = {
+          ...currentMilestone.value
+        };
+        
+        // 如果是编辑操作，确保ID不为空
+        if (isEditing.value && !milestoneData.id) {
+          ElMessage.error('里程碑ID不能为空')
+          return
         }
-        dialogVisible.value = false
-        loadMilestones()
+        
+        let response;
+        if (isEditing.value) {
+          response = await updateMilestone(milestoneData.id, milestoneData)
+        } else {
+          response = await createMilestone(milestoneData)
+        }
+        
+        // 检查后端返回的结果
+        if (response.data.success !== false) {
+          ElMessage.success(isEditing.value ? '更新成功' : '创建成功')
+          dialogVisible.value = false
+          loadMilestones()
+        } else {
+          ElMessage.error(response.data.message || (isEditing.value ? '更新失败' : '创建失败'))
+        }
       } catch (error) {
-        ElMessage.error('保存失败')
+        console.error('保存失败:', error)
+        ElMessage.error('保存失败: ' + (error.response?.data?.message || error.message || '未知错误'))
       }
     }
     
@@ -158,11 +178,18 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         })
-        await deleteMilestone(id)
-        ElMessage.success('删除成功')
-        loadMilestones()
+        const response = await deleteMilestone(id)
+        // 检查后端返回的结果
+        if (response.data.success !== false) {
+          ElMessage.success('删除成功')
+          loadMilestones()
+        } else {
+          ElMessage.error(response.data.message || '删除失败')
+        }
       } catch (error) {
-        ElMessage.error('删除失败')
+        if (error !== 'cancel' && error !== '取消') {
+          ElMessage.error('删除失败: ' + (error.response?.data?.message || error.message || '未知错误'))
+        }
       }
     }
     

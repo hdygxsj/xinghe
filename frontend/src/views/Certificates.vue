@@ -108,21 +108,22 @@
     <el-dialog
       title="证书详情"
       v-model="viewDialogVisible"
-      width="500px"
+      width="80%"
+      top="50px"
     >
-      <div v-if="selectedCertificate">
-        <el-descriptions :column="1" border>
-          <el-descriptions-item label="证书标题">{{ selectedCertificate.title }}</el-descriptions-item>
-          <el-descriptions-item label="证书类型">{{ selectedCertificate.certificateType }}</el-descriptions-item>
-          <el-descriptions-item label="颁发日期">{{ formatDate(selectedCertificate.issueDate) }}</el-descriptions-item>
-          <el-descriptions-item label="颁发机构">{{ selectedCertificate.issuer }}</el-descriptions-item>
-          <el-descriptions-item label="描述">{{ selectedCertificate.description }}</el-descriptions-item>
-        </el-descriptions>
+      <div v-if="selectedCertificate" class="certificate-preview">
+        <iframe 
+          :src="certificateViewUrl" 
+          width="100%" 
+          height="600px" 
+          frameborder="0"
+          v-if="certificateViewUrl"
+        ></iframe>
       </div>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="viewDialogVisible = false">关闭</el-button>
-          <el-button type="primary" @click="downloadCertificate(selectedCertificate)">下载</el-button>
+          <el-button type="primary" @click="downloadCertificate(selectedCertificate)">下载PDF</el-button>
         </span>
       </template>
     </el-dialog>
@@ -144,12 +145,13 @@ export default {
     const contactDialogVisible = ref(false)
     const viewDialogVisible = ref(false)
     const selectedCertificate = ref(null)
+    const certificateViewUrl = ref('')
     const annualForm = ref({
-      employeeId: '',
+      employeeId: '1',
       year: ''
     })
     const contactForm = ref({
-      employeeId: ''
+      employeeId: '1'
     })
     const availableYears = ref([])
     
@@ -222,10 +224,10 @@ export default {
       try {
         const response = await downloadCertificate(certificate.id)
         // 创建下载链接
-        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))
         const link = document.createElement('a')
         link.href = url
-        link.setAttribute('download', `${certificate.title}.txt`)
+        link.setAttribute('download', `${certificate.title}.pdf`)
         document.body.appendChild(link)
         link.click()
         link.remove()
@@ -238,6 +240,7 @@ export default {
     
     const viewCertificate = (certificate) => {
       selectedCertificate.value = certificate
+      certificateViewUrl.value = `/certificates/${certificate.id}/view`
       viewDialogVisible.value = true
     }
     
@@ -268,6 +271,7 @@ export default {
       contactDialogVisible,
       viewDialogVisible,
       selectedCertificate,
+      certificateViewUrl,
       annualForm,
       contactForm,
       availableYears,
@@ -350,5 +354,9 @@ export default {
   justify-content: flex-end;
   gap: 10px;
   margin-top: 15px;
+}
+
+.certificate-preview {
+  text-align: center;
 }
 </style>
