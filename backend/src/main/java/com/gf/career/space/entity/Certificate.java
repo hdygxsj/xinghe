@@ -21,6 +21,9 @@ public class Certificate {
     @TableField("certificate_type")
     private String certificateType; // 年度考核证明、在职联系人证明、荣誉证明
     
+    @TableField("grade")
+    private String grade; // 年度考核等级: A, B, C, D (仅用于年度考核证明)
+    
     private String title;
     private String description;
     

@@ -13,9 +13,9 @@ export const getCertificatesByEmployeeId = (employeeId) => {
 }
 
 // 生成年度考核证明
-export const generateAnnualAssessmentCertificate = (employeeId, year) => {
+export const generateAnnualAssessmentCertificate = (employeeId, year, grade = 'C') => {
   return apiClient.post(`${BASE_URL}/certificate/annual-assessment`, null, {
-    params: { employeeId, year }
+    params: { employeeId, year, grade }
   })
 }
 

@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS certificate (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     employee_id BIGINT NOT NULL,
     certificate_type VARCHAR(100) NOT NULL,
+    grade VARCHAR(1),
     title VARCHAR(200) NOT NULL,
     description TEXT,
     issue_date DATETIME,

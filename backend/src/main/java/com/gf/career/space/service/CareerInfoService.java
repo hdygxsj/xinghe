@@ -25,9 +25,10 @@ public interface CareerInfoService {
      * 生成年度考核证明
      * @param employeeId 员工ID
      * @param year 年份
+     * @param grade 绩效等级 (A, B, C, D)
      * @return 证明信息
      */
-    Certificate generateAnnualAssessmentCertificate(Long employeeId, int year);
+    Certificate generateAnnualAssessmentCertificate(Long employeeId, int year, String grade);
 
     /**
      * 生成在职联系人证明

@@ -45,12 +45,33 @@ public class CareerInfoServiceImpl implements CareerInfoService {
     }
 
     @Override
-    public Certificate generateAnnualAssessmentCertificate(Long employeeId, int year) {
+    public Certificate generateAnnualAssessmentCertificate(Long employeeId, int year, String grade) {
         Certificate certificate = new Certificate();
         certificate.setEmployeeId(employeeId);
         certificate.setCertificateType("年度考核证明");
+        certificate.setGrade(grade);
         certificate.setTitle(year + "年度考核证明");
-        certificate.setDescription("兹证明该员工在" + year + "年度表现优秀，考核结果为合格。");
+        
+        // 根据等级设置不同的描述
+        String gradeDesc = "";
+        switch (grade) {
+            case "A":
+                gradeDesc = "优秀";
+                break;
+            case "B":
+                gradeDesc = "良好";
+                break;
+            case "C":
+                gradeDesc = "合格";
+                break;
+            case "D":
+                gradeDesc = "待改进";
+                break;
+            default:
+                gradeDesc = "合格";
+        }
+        
+        certificate.setDescription("兹证明该员工在" + year + "年度表现" + gradeDesc + "，考核结果为" + gradeDesc + "。");
         certificate.setIssueDate(LocalDateTime.now());
         certificate.setIssuer("人力资源部");
         certificate.setCreateTime(LocalDateTime.now());

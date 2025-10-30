@@ -49,14 +49,17 @@ public class CareerInfoController {
     }
 
     @PostMapping("/certificate/annual-assessment")
-    public Certificate generateAnnualAssessmentCertificate(@RequestParam Long employeeId, @RequestParam int year) {
+    public Certificate generateAnnualAssessmentCertificate(
+            @RequestParam Long employeeId, 
+            @RequestParam int year,
+            @RequestParam(defaultValue = "C") String grade) {
         // 检查是否是当前用户或有权限访问
         Long currentUserId = getCurrentUserId();
         if (currentUserId == null || !currentUserId.equals(employeeId)) {
             throw new RuntimeException("无权生成该员工的证书");
         }
         
-        return careerInfoService.generateAnnualAssessmentCertificate(employeeId, year);
+        return careerInfoService.generateAnnualAssessmentCertificate(employeeId, year, grade);
     }
 
     @PostMapping("/certificate/employment-contact")

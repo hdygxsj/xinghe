@@ -29,9 +29,18 @@
           <el-card class="certificate-card">
             <div class="certificate-header">
               <h3>{{ certificate.title }}</h3>
-              <el-tag :type="getTagType(certificate.certificateType)">
-                {{ certificate.certificateType }}
-              </el-tag>
+              <div class="header-tags">
+                <el-tag :type="getTagType(certificate.certificateType)">
+                  {{ certificate.certificateType }}
+                </el-tag>
+                <el-tag 
+                  v-if="certificate.grade && certificate.certificateType === '年度考核证明'" 
+                  :type="getGradeTagType(certificate.grade)"
+                  class="grade-tag"
+                >
+                  等级: {{ certificate.grade }} - {{ getGradeLabel(certificate.grade) }}
+                </el-tag>
+              </div>
             </div>
             <div class="certificate-content">
               <p>{{ certificate.description }}</p>
@@ -65,7 +74,7 @@
       v-model="annualDialogVisible"
       width="400px"
     >
-      <el-form :model="annualForm" label-width="80px">
+      <el-form :model="annualForm" label-width="100px">
         <el-form-item label="年份">
           <el-select v-model="annualForm.year" placeholder="请选择年份">
             <el-option
@@ -74,6 +83,14 @@
               :label="year"
               :value="year"
             ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="考核等级">
+          <el-select v-model="annualForm.grade" placeholder="请选择考核等级">
+            <el-option label="A - 优秀" value="A"></el-option>
+            <el-option label="B - 良好" value="B"></el-option>
+            <el-option label="C - 合格" value="C"></el-option>
+            <el-option label="D - 待改进" value="D"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -159,7 +176,8 @@ export default {
     const currentUser = ref(null)
     const annualForm = ref({
       employeeId: null,
-      year: ''
+      year: '',
+      grade: 'A'
     })
     const contactForm = ref({
       employeeId: null
@@ -184,6 +202,26 @@ export default {
         '荣誉证明': 'warning'
       }
       return typeMap[type] || 'info'
+    }
+    
+    const getGradeTagType = (grade) => {
+      const gradeMap = {
+        'A': 'danger',
+        'B': 'warning',
+        'C': 'success',
+        'D': 'info'
+      }
+      return gradeMap[grade] || 'info'
+    }
+    
+    const getGradeLabel = (grade) => {
+      const labelMap = {
+        'A': '优秀',
+        'B': '良好',
+        'C': '合格',
+        'D': '待改进'
+      }
+      return labelMap[grade] || grade
     }
     
     const generateYears = () => {
@@ -213,9 +251,20 @@ export default {
           return
         }
         
+        if (!annualForm.value.year) {
+          ElMessage.error('请选择年份')
+          return
+        }
+        
+        if (!annualForm.value.grade) {
+          ElMessage.error('请选择考核等级')
+          return
+        }
+        
         await generateAnnualAssessmentCertificate(
           currentUser.value.id,
-          annualForm.value.year
+          annualForm.value.year,
+          annualForm.value.grade
         )
         ElMessage.success('年度考核证明生成成功')
         annualDialogVisible.value = false
@@ -335,6 +384,8 @@ export default {
       filteredCertificates,
       handleTabChange,
       getTagType,
+      getGradeTagType,
+      getGradeLabel,
       generateAnnualCertificate,
       generateContactCertificate,
       generateHonorCertificate,
@@ -412,6 +463,18 @@ export default {
 .certificate-header .el-tag {
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+.header-tags {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.grade-tag {
+  font-weight: bold;
 }
 
 .certificate-content {
