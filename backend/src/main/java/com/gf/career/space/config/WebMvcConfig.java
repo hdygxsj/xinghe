@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.gf.career.space.filter.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +26,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Bean
     public ObjectMapper objectMapper() {
         JavaTimeModule module = new JavaTimeModule();
-        module.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        
+        // 添加序列化器和反序列化器
+        module.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(formatter));
+        module.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(formatter));
         
         return Jackson2ObjectMapperBuilder.json()
                 .modules(module)

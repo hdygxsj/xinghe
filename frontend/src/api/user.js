@@ -42,3 +42,6 @@ export const register = (userData) => {
 export const login = (credentials) => {
   return axios.post(`${BASE_URL}/login`, credentials)
 }
+
+// 导出axios实例作为默认导出
+export default axios

@@ -1,28 +1,28 @@
-import axios from 'axios'
+import apiClient from './user'
 
 const BASE_URL = '/api/mentors'
 
+// 创建导师
+export const createMentor = (mentorData) => {
+  return apiClient.post(BASE_URL, mentorData)
+}
+
 // 获取所有导师
 export const getMentors = () => {
-  return axios.get(BASE_URL)
+  return apiClient.get(BASE_URL)
 }
 
 // 根据ID获取导师
 export const getMentorById = (id) => {
-  return axios.get(`${BASE_URL}/${id}`)
-}
-
-// 创建导师
-export const createMentor = (mentor) => {
-  return axios.post(BASE_URL, mentor)
+  return apiClient.get(`${BASE_URL}/${id}`)
 }
 
 // 更新导师
-export const updateMentor = (id, mentor) => {
-  return axios.put(`${BASE_URL}/${id}`, mentor)
+export const updateMentor = (id, mentorData) => {
+  return apiClient.put(`${BASE_URL}/${id}`, mentorData)
 }
 
 // 删除导师
 export const deleteMentor = (id) => {
-  return axios.delete(`${BASE_URL}/${id}`)
+  return apiClient.delete(`${BASE_URL}/${id}`)
 }

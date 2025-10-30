@@ -1,28 +1,28 @@
-import axios from 'axios'
+import apiClient from './user'
 
 const BASE_URL = '/api/skills'
 
+// 创建技能
+export const createSkill = (skillData) => {
+  return apiClient.post(BASE_URL, skillData)
+}
+
 // 获取所有技能
 export const getSkills = () => {
-  return axios.get(BASE_URL)
+  return apiClient.get(BASE_URL)
 }
 
 // 根据ID获取技能
 export const getSkillById = (id) => {
-  return axios.get(`${BASE_URL}/${id}`)
-}
-
-// 创建技能
-export const createSkill = (skill) => {
-  return axios.post(BASE_URL, skill)
+  return apiClient.get(`${BASE_URL}/${id}`)
 }
 
 // 更新技能
-export const updateSkill = (id, skill) => {
-  return axios.put(`${BASE_URL}/${id}`, skill)
+export const updateSkill = (id, skillData) => {
+  return apiClient.put(`${BASE_URL}/${id}`, skillData)
 }
 
 // 删除技能
 export const deleteSkill = (id) => {
-  return axios.delete(`${BASE_URL}/${id}`)
+  return apiClient.delete(`${BASE_URL}/${id}`)
 }

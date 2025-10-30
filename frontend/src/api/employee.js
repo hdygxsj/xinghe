@@ -1,28 +1,23 @@
-import axios from 'axios'
+import apiClient from './user'
 
 const BASE_URL = '/api/employees'
 
 // 获取所有员工
-export const getEmployees = () => {
-  return axios.get(BASE_URL)
+export const getAllEmployees = () => {
+  return apiClient.get(BASE_URL)
 }
 
 // 根据ID获取员工
 export const getEmployeeById = (id) => {
-  return axios.get(`${BASE_URL}/${id}`)
-}
-
-// 创建员工
-export const createEmployee = (employee) => {
-  return axios.post(BASE_URL, employee)
+  return apiClient.get(`${BASE_URL}/${id}`)
 }
 
 // 更新员工
-export const updateEmployee = (id, employee) => {
-  return axios.put(`${BASE_URL}/${id}`, employee)
+export const updateEmployee = (id, employeeData) => {
+  return apiClient.put(`${BASE_URL}/${id}`, employeeData)
 }
 
 // 删除员工
 export const deleteEmployee = (id) => {
-  return axios.delete(`${BASE_URL}/${id}`)
+  return apiClient.delete(`${BASE_URL}/${id}`)
 }

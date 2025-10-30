@@ -4,24 +4,19 @@ import com.gf.career.space.entity.Employee;
 import com.gf.career.space.service.EmployeeService;
 import com.gf.career.space.util.JwtUtil;
 import com.gf.career.space.util.UserContextHolder;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.io.IOException;
 
 @Component
 public class JwtFilter implements HandlerInterceptor {
 
     @Autowired
     private JwtUtil jwtUtil;
-    
+
     @Autowired
     private EmployeeService employeeService;
 

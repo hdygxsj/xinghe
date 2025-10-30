@@ -124,7 +124,7 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue'
-import { getCertificatesByEmployeeId, downloadCertificate } from '@/api/certificate'
+import { getCertificatesByEmployeeId, downloadCertificatePdf } from '@/api/certificate'
 import { generateAnnualAssessmentCertificate, generateEmploymentContactCertificate, generateHonorCertificate } from '@/api/careerInfo'
 import { ElMessage } from 'element-plus'
 
@@ -225,7 +225,7 @@ export default {
     
     const downloadCertificateHandler = async (certificate) => {
       try {
-        const response = await downloadCertificate(certificate.id)
+        const response = await downloadCertificatePdf(certificate.id)
         // 创建下载链接
         const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))
         const link = document.createElement('a')

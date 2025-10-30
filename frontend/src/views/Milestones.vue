@@ -32,7 +32,7 @@
               <span class="milestone-type">{{ milestone.type }}</span>
               <div class="actions">
                 <el-button size="small" @click="editMilestone(milestone)">编辑</el-button>
-                <el-button size="small" type="danger" @click="deleteMilestone(milestone.id)">删除</el-button>
+                <el-button size="small" type="danger" @click="handleDeleteMilestone(milestone.id)">删除</el-button>
               </div>
             </div>
           </el-card>
@@ -69,7 +69,7 @@
             type="date"
             placeholder="选择日期"
             format="YYYY-MM-DD"
-            value-format="YYYY-MM-DD"
+            value-format="YYYY-MM-DD HH:mm:ss"
           ></el-date-picker>
         </el-form-item>
       </el-form>
@@ -85,7 +85,7 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue'
-import { getMilestonesByEmployeeId, createMilestone, updateMilestone, deleteMilestone } from '@/api/milestone'
+import { getMilestoneById, getMilestonesByEmployeeId, createMilestone, updateMilestone, deleteMilestone } from '@/api/milestone'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 export default {
@@ -138,12 +138,39 @@ export default {
       dialogVisible.value = true
     }
     
+    const handleDeleteMilestone = async (id) => {
+      try {
+        await ElMessageBox.confirm('确认删除该里程碑吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+        const response = await deleteMilestone(id)
+        // 检查后端返回的结果
+        if (response.data.success !== false) {
+          ElMessage.success('删除成功')
+          loadMilestones()
+        } else {
+          ElMessage.error(response.data.message || '删除失败')
+        }
+      } catch (error) {
+        if (error !== 'cancel' && error !== '取消') {
+          ElMessage.error('删除失败: ' + (error.response?.data?.message || error.message || '未知错误'))
+        }
+      }
+    }
+    
     const saveMilestone = async () => {
       try {
         // 确保传递正确的数据格式
         const milestoneData = {
           ...currentMilestone.value
         };
+        
+        // 如果eventDate是日期对象，转换为字符串
+        if (milestoneData.eventDate instanceof Date) {
+          milestoneData.eventDate = formatDateForBackend(milestoneData.eventDate);
+        }
         
         // 确保员工ID正确
         if (!milestoneData.employeeId && currentUser.value) {
@@ -177,28 +204,6 @@ export default {
       }
     }
     
-    const deleteMilestone = async (id) => {
-      try {
-        await ElMessageBox.confirm('确认删除该里程碑吗？', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-        const response = await deleteMilestone(id)
-        // 检查后端返回的结果
-        if (response.data.success !== false) {
-          ElMessage.success('删除成功')
-          loadMilestones()
-        } else {
-          ElMessage.error(response.data.message || '删除失败')
-        }
-      } catch (error) {
-        if (error !== 'cancel' && error !== '取消') {
-          ElMessage.error('删除失败: ' + (error.response?.data?.message || error.message || '未知错误'))
-        }
-      }
-    }
-    
     const loadMilestones = async () => {
       try {
         if (currentUser.value && currentUser.value.id) {
@@ -206,7 +211,7 @@ export default {
           milestones.value = response.data
         }
       } catch (error) {
-        ElMessage.error('加载里程碑失败')
+        ElMessage.error('加载里程碑失败: ' + (error.response?.data?.message || error.message || '未知错误'))
       }
     }
     
@@ -214,6 +219,17 @@ export default {
       if (!dateString) return ''
       const date = new Date(dateString)
       return date.toLocaleDateString('zh-CN')
+    }
+    
+    const formatDateForBackend = (date) => {
+      if (!date) return ''
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      const seconds = String(date.getSeconds()).padStart(2, '0')
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
     }
     
     onMounted(() => {
@@ -237,7 +253,7 @@ export default {
       showAddDialog,
       editMilestone,
       saveMilestone,
-      deleteMilestone,
+      handleDeleteMilestone,
       formatDate,
       loadMilestones
     }
