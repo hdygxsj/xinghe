@@ -80,6 +80,34 @@
       </el-table>
     </div>
 
+    <!-- 选择导师对话框 -->
+    <el-dialog title="选择导师" v-model="selectMentorDialogVisible" width="900px">
+      <el-table 
+        :data="allMentors" 
+        style="width: 100%" 
+        v-loading="loading"
+        highlight-current-row
+        @row-click="handleMentorRowClick"
+      >
+        <el-table-column type="index" width="50" label="序号"></el-table-column>
+        <el-table-column prop="name" label="姓名" width="100"></el-table-column>
+        <el-table-column prop="department" label="部门" width="120"></el-table-column>
+        <el-table-column prop="position" label="职位" width="120"></el-table-column>
+        <el-table-column prop="expertise" label="专长" width="200"></el-table-column>
+        <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
+        <el-table-column label="操作" width="100" fixed="right">
+          <template #default="scope">
+            <el-button size="small" type="primary" @click="selectMentor(scope.row)">选择</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="selectMentorDialogVisible = false">取消</el-button>
+        </span>
+      </template>
+    </el-dialog>
+
     <!-- 申请导师对话框 -->
     <el-dialog title="申请导师指导" v-model="mentorshipDialogVisible" width="500px">
       <el-form :model="currentMentorship" label-width="80px">
@@ -139,6 +167,7 @@ export default {
     const myMentorships = ref([])
     const loading = ref(false)
     const activeTab = ref('mentors')
+    const selectMentorDialogVisible = ref(false)
     const mentorshipDialogVisible = ref(false)
     const mentorshipDetailDialogVisible = ref(false)
     const mentorshipDetailTitle = ref('')
@@ -207,8 +236,29 @@ export default {
       }
     }
 
-    const showMentorshipDialog = () => {
-      ElMessage.info('请选择一个导师来申请指导')
+    const showMentorshipDialog = async () => {
+      // 加载所有导师列表
+      await loadMentors()
+      // 打开选择导师对话框
+      selectMentorDialogVisible.value = true
+    }
+
+    const selectMentor = (mentor) => {
+      selectedMentor.value = mentor
+      currentMentorship.value = {
+        mentorId: mentor.id,
+        menteeId: currentUser.value ? currentUser.value.id : null,
+        status: 'REQUESTED',
+        goals: ''
+      }
+      // 关闭选择对话框，打开申请对话框
+      selectMentorDialogVisible.value = false
+      mentorshipDialogVisible.value = true
+    }
+
+    const handleMentorRowClick = (row) => {
+      // 可选：点击行也可以选择导师
+      // selectMentor(row)
     }
 
     const applyForMentor = (mentor) => {
@@ -223,13 +273,19 @@ export default {
     }
 
     const saveMentorship = async () => {
+      if (!currentMentorship.value.goals || currentMentorship.value.goals.trim() === '') {
+        ElMessage.warning('请输入指导目标')
+        return
+      }
       try {
         await createMentorship(currentMentorship.value)
-        ElMessage.success('导师申请已提交')
+        ElMessage.success('导师申请已提交，请等待导师确认')
         mentorshipDialogVisible.value = false
-        loadMyMentorships()
+        // 切换到“我的导师”标签页
+        activeTab.value = 'mentors'
+        await loadMyMentorships()
       } catch (error) {
-        ElMessage.error('申请失败')
+        ElMessage.error('申请失败，请重试')
       }
     }
 
@@ -281,6 +337,7 @@ export default {
       myMentees,
       loading,
       activeTab,
+      selectMentorDialogVisible,
       mentorshipDialogVisible,
       mentorshipDetailDialogVisible,
       mentorshipDetailTitle,
@@ -288,6 +345,8 @@ export default {
       currentMentorship,
       handleTabChange,
       showMentorshipDialog,
+      selectMentor,
+      handleMentorRowClick,
       applyForMentor,
       saveMentorship,
       viewMentorship,
