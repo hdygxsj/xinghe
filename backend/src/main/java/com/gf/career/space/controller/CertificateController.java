@@ -179,9 +179,15 @@ public class CertificateController {
                 // 生成PDF证书
                 byte[] pdfContent = pdfService.generateCertificatePdf(certificate);
                 
+                // 使用URL编码处理中文文件名
+                String fileName = certificate.getTitle() + ".pdf";
+                String encodedFileName = java.net.URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+                
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_PDF);
-                headers.setContentDispositionFormData("attachment", certificate.getTitle() + ".pdf");
+                // 使用RFC 5987的filename*格式支持中文文件名
+                headers.set(HttpHeaders.CONTENT_DISPOSITION, 
+                    "attachment; filename=\"" + encodedFileName + "\"; filename*=UTF-8''" + encodedFileName);
                 headers.setContentLength(pdfContent.length);
                 
                 return ResponseEntity.ok()

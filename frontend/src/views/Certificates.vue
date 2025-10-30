@@ -19,7 +19,10 @@
     <div class="certificates-grid">
       <el-row :gutter="20">
         <el-col 
-          :span="8" 
+          :xs="24"
+          :sm="12"
+          :md="8"
+          :lg="8"
           v-for="certificate in filteredCertificates" 
           :key="certificate.id"
         >
@@ -98,19 +101,32 @@
     
     <!-- 证书查看对话框 -->
     <el-dialog
-      title="证书详情"
+      title="证书预览"
       v-model="viewDialogVisible"
-      width="80%"
-      top="50px"
+      width="90%"
+      top="5vh"
+      :close-on-click-modal="false"
+      class="certificate-dialog"
     >
-      <div v-if="selectedCertificate" class="certificate-preview">
+      <div v-if="selectedCertificate" class="certificate-preview" v-loading="previewLoading">
         <iframe 
           :src="certificateViewUrl" 
           width="100%" 
           height="600px" 
           frameborder="0"
           v-if="certificateViewUrl"
+          @load="handleIframeLoad"
+          @error="handleIframeError"
         ></iframe>
+        <div v-if="previewError" class="preview-error">
+          <el-alert
+            title="预览失败"
+            type="error"
+            :closable="false"
+            description="无法加载证书预览，请尝试下载PDF文件查看。"
+          >
+          </el-alert>
+        </div>
       </div>
       <template #footer>
         <span class="dialog-footer">
@@ -138,6 +154,8 @@ export default {
     const viewDialogVisible = ref(false)
     const selectedCertificate = ref(null)
     const certificateViewUrl = ref('')
+    const previewLoading = ref(false)
+    const previewError = ref(false)
     const currentUser = ref(null)
     const annualForm = ref({
       employeeId: null,
@@ -241,10 +259,24 @@ export default {
       }
     }
     
-    const viewCertificate = (certificate) => {
+    const viewCertificate = async (certificate) => {
       selectedCertificate.value = certificate
-      certificateViewUrl.value = `/certificates/${certificate.id}/view`
+      previewLoading.value = true
+      previewError.value = false
+      // 使用后端API的完整地址
+      certificateViewUrl.value = `http://localhost:8080/certificates/${certificate.id}/view`
       viewDialogVisible.value = true
+    }
+    
+    const handleIframeLoad = () => {
+      previewLoading.value = false
+      previewError.value = false
+    }
+    
+    const handleIframeError = () => {
+      previewLoading.value = false
+      previewError.value = true
+      ElMessage.error('证书预览加载失败，请尝试下载')
     }
     
     const loadCertificates = async () => {
@@ -286,6 +318,8 @@ export default {
       viewDialogVisible,
       selectedCertificate,
       certificateViewUrl,
+      previewLoading,
+      previewError,
       annualForm,
       contactForm,
       availableYears,
@@ -299,6 +333,8 @@ export default {
       confirmGenerateContact,
       downloadCertificate: downloadCertificateHandler,
       viewCertificate,
+      handleIframeLoad,
+      handleIframeError,
       formatDate,
       loadCertificates
     }
@@ -313,13 +349,21 @@ export default {
 
 .header-section {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  gap: 15px;
+}
+
+.header-section h2 {
+  margin: 0;
+  flex-shrink: 0;
 }
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
@@ -329,22 +373,51 @@ export default {
 
 .certificate-card {
   margin-bottom: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.certificate-card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .certificate-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 15px;
+  gap: 10px;
 }
 
 .certificate-header h3 {
   margin: 0;
+  flex: 1;
+  font-size: 16px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.certificate-header .el-tag {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.certificate-content {
+  flex: 1;
 }
 
 .certificate-content p {
   color: #666;
   line-height: 1.6;
+  margin: 0 0 15px 0;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .certificate-info {
@@ -355,12 +428,21 @@ export default {
 
 .info-item {
   display: flex;
+  flex-direction: column;
   margin-bottom: 8px;
+  word-break: break-word;
 }
 
 .info-item label {
-  width: 80px;
   font-weight: bold;
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 3px;
+}
+
+.info-item span {
+  font-size: 14px;
+  color: #333;
 }
 
 .certificate-footer {
@@ -368,9 +450,89 @@ export default {
   justify-content: flex-end;
   gap: 10px;
   margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.certificate-footer .el-button {
+  flex: 1;
+  min-width: 60px;
 }
 
 .certificate-preview {
   text-align: center;
+  min-height: 400px;
+  max-height: calc(85vh - 200px);
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.certificate-preview iframe {
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+
+.preview-error {
+  width: 100%;
+  padding: 50px;
+}
+
+/* 证书预览对话框样式 */
+:deep(.certificate-dialog) {
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+  margin-top: 5vh !important;
+}
+
+:deep(.certificate-dialog .el-dialog__body) {
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+  max-height: calc(85vh - 120px);
+}
+
+:deep(.certificate-dialog .el-dialog__footer) {
+  border-top: 1px solid #eee;
+  padding: 15px 20px;
+  background: #fff;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .certificates {
+    padding: 15px;
+  }
+  
+  .header-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .header-section h2 {
+    width: 100%;
+  }
+  
+  .actions {
+    width: 100%;
+  }
+  
+  .actions .el-button {
+    flex: 1;
+  }
+  
+  .certificate-card {
+    margin-bottom: 15px;
+  }
+  
+  .certificate-footer .el-button {
+    min-width: auto;
+  }
+  
+  :deep(.certificate-dialog) {
+    width: 95% !important;
+  }
 }
 </style>

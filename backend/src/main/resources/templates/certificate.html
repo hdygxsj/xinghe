@@ -1,16 +1,16 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <title th:text="${certificate.title} + ' - GF职业空间'">证书 - GF职业空间</title>
-    <style>
+    <style type="text/css">
         @page {
             size: A4;
             margin: 0;
         }
         
         body {
-            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            font-family: 'SimSun', 'Microsoft YaHei', sans-serif;
             background-color: #ffffff;
             margin: 0;
             padding: 0;
@@ -18,145 +18,158 @@
         
         .certificate-container {
             width: 210mm;
-            height: 297mm;
+            min-height: 297mm;
             margin: 0 auto;
             background: white;
-            position: relative;
-            box-sizing: border-box;
+            padding: 0;
         }
         
         .certificate-header {
-            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            background-color: #ff6b35;
             color: white;
             text-align: center;
-            padding: 40px 20px 30px;
+            padding: 40px 20px 30px 20px;
+            margin: 0;
         }
         
         .certificate-title {
             font-size: 28px;
             font-weight: bold;
             margin: 0;
-            letter-spacing: 2px;
+            padding: 0;
+            color: white;
         }
         
         .certificate-subtitle {
             font-size: 16px;
-            margin-top: 10px;
-            opacity: 0.9;
+            margin: 10px 0 0 0;
+            padding: 0;
+            color: white;
         }
         
         .certificate-body {
-            padding: 30px 40px;
+            padding: 40px 60px;
         }
         
         .certificate-content {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .cert-intro {
+            font-size: 16px;
+            color: #666;
+            margin: 0 0 20px 0;
         }
         
         .recipient-name {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             color: #ff6b35;
             margin: 20px 0;
+            padding: 0;
         }
         
         .certificate-text {
             font-size: 16px;
-            line-height: 1.8;
+            line-height: 2;
             color: #333;
-            margin: 25px 0;
+            margin: 30px 0;
+            padding: 0 20px;
         }
         
         .certificate-details {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            margin: 30px 0;
-        }
-        
-        .detail-item {
-            margin: 10px 15px;
+            margin: 40px 0;
             text-align: center;
         }
         
+        .details-table {
+            width: 100%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        
+        .details-table td {
+            padding: 15px;
+            text-align: center;
+            vertical-align: top;
+        }
+        
         .detail-label {
-            font-size: 12px;
+            font-size: 13px;
             color: #666;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
         
         .detail-value {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
             color: #333;
         }
         
         .certificate-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid #ddd;
         }
         
-        .issuer-info {
+        .footer-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .footer-table td {
+            vertical-align: top;
+            padding: 10px;
+        }
+        
+        .footer-left {
+            width: 60%;
             text-align: left;
         }
         
+        .footer-right {
+            width: 40%;
+            text-align: right;
+        }
+        
         .issuer-name {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
             color: #333;
+            margin-bottom: 10px;
         }
         
         .issue-date {
-            font-size: 12px;
+            font-size: 14px;
             color: #666;
-            margin-top: 5px;
         }
         
         .certificate-seal {
-            width: 100px;
-            height: 100px;
-            border: 2px solid #ff6b35;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-            color: #ff6b35;
-            text-align: center;
+            width: 120px;
+            height: 120px;
+            margin-left: auto;
+            margin-right: 0;
+            position: relative;
+        }
+        
+        .seal-svg {
+            width: 120px;
+            height: 120px;
         }
         
         .certificate-id {
             text-align: center;
-            font-size: 11px;
+            font-size: 12px;
             color: #999;
-            margin-top: 25px;
-            padding-top: 10px;
-            border-top: 1px dashed #eee;
-        }
-        
-        .watermark {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-30deg);
-            font-size: 60px;
-            font-weight: bold;
-            color: rgba(255, 107, 53, 0.05);
-            pointer-events: none;
-            z-index: 0;
+            margin-top: 40px;
+            padding-top: 15px;
+            border-top: 1px dashed #ddd;
         }
     </style>
 </head>
 <body>
     <div class="certificate-container">
-        <div class="watermark">GF职业空间</div>
-        
         <div class="certificate-header">
             <h1 class="certificate-title" th:text="${certificate.title}">证书标题</h1>
             <div class="certificate-subtitle" th:text="${certificate.certificateType}">证书类型</div>
@@ -164,38 +177,73 @@
         
         <div class="certificate-body">
             <div class="certificate-content">
-                <p style="font-size: 16px; color: #666;">兹证明</p>
+                <p class="cert-intro">兹证明</p>
                 <div class="recipient-name" th:text="${employeeName}">员工姓名</div>
                 <p class="certificate-text" th:text="${certificate.description}">证书描述内容</p>
             </div>
             
             <div class="certificate-details">
-                <div class="detail-item">
-                    <div class="detail-label">证书编号</div>
-                    <div class="detail-value" th:text="${certificate.id}">001</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">颁发日期</div>
-                    <div class="detail-value" th:text="${#temporals.format(certificate.issueDate, 'yyyy年MM月dd日')}">2023年01月01日</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">证书类型</div>
-                    <div class="detail-value" th:text="${certificate.certificateType}">证书类型</div>
-                </div>
+                <table class="details-table">
+                    <tr>
+                        <td>
+                            <div class="detail-label">证书编号</div>
+                            <div class="detail-value" th:text="${certificate.id}">001</div>
+                        </td>
+                        <td>
+                            <div class="detail-label">颁发日期</div>
+                            <div class="detail-value" th:text="${#temporals.format(certificate.issueDate, 'yyyy年MM月dd日')}">2023年01月01日</div>
+                        </td>
+                        <td>
+                            <div class="detail-label">证书类型</div>
+                            <div class="detail-value" th:text="${certificate.certificateType}">证书类型</div>
+                        </td>
+                    </tr>
+                </table>
             </div>
             
             <div class="certificate-footer">
-                <div class="issuer-info">
-                    <div class="issuer-name" th:text="${certificate.issuer}">颁发机构</div>
-                    <div class="issue-date">颁发日期: <span th:text="${#temporals.format(certificate.issueDate, 'yyyy年MM月dd日')}">2023年01月01日</span></div>
-                </div>
-                <div class="certificate-seal">
-                    GF职业空间<br>认证 seal
-                </div>
+                <table class="footer-table">
+                    <tr>
+                        <td class="footer-left">
+                            <div class="issuer-name" th:text="${certificate.issuer}">颁发机构</div>
+                            <div class="issue-date">
+                                颁发日期: <span th:text="${#temporals.format(certificate.issueDate, 'yyyy年MM月dd日')}">2023年01月01日</span>
+                            </div>
+                        </td>
+                        <td class="footer-right">
+                            <div class="certificate-seal">
+                                <svg class="seal-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                                    <!-- 圆形边框 -->
+                                    <circle cx="60" cy="60" r="57" fill="none" stroke="#ff6b35" stroke-width="3"/>
+                                    
+                                    <!-- 上半圆环形文字 - 缩小半径让文字离边界远一点 -->
+                                    <path id="topArc" d="M 20,60 A 40,40 0 0,1 100,60" fill="none"/>
+                                    <text font-size="12" font-weight="bold" fill="#ff6b35" font-family="SimSun, Microsoft YaHei, sans-serif">
+                                        <textPath href="#topArc" startOffset="50%" text-anchor="middle">
+                                            广发银行黑客马拉松
+                                        </textPath>
+                                    </text>
+                                    
+                                    <!-- 下半圆环形文字 - 缩小半径让文字离边界远一点 -->
+                                    <path id="bottomArc" d="M 100,60 A 40,40 0 0,1 20,60" fill="none"/>
+                                    <text font-size="13" font-weight="bold" fill="#ff6b35" font-family="SimSun, Microsoft YaHei, sans-serif">
+                                        <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">
+                                            GF职业空间
+                                        </textPath>
+                                    </text>
+                                    
+                                    <!-- 中心五角星 -->
+                                    <path d="M 60,35 L 64,48 L 78,48 L 67,56 L 71,69 L 60,61 L 49,69 L 53,56 L 42,48 L 56,48 Z" 
+                                          fill="none" stroke="#ff6b35" stroke-width="1.5"/>
+                                </svg>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
             </div>
             
             <div class="certificate-id">
-                证书ID: <span th:text="${certificate.id}">001</span> | 
+                证书ID: <span th:text="${certificate.id}">001</span> |
                 验证码: <span th:text="${verificationCode}">ABC123</span>
             </div>
         </div>

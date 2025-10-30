@@ -34,5 +34,5 @@ export const deleteCertificate = (id) => {
 
 // 下载证书PDF
 export const downloadCertificatePdf = (id) => {
-  return apiClient.get(`/api/certificate/view/${id}`, { responseType: 'blob' })
+  return apiClient.get(`${BASE_URL}/${id}/download`, { responseType: 'blob' })
 }
