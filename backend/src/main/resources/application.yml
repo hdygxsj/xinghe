@@ -9,6 +9,9 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password: 
+    initialization-mode: always
+    schema: classpath:schema.sql
+    data: classpath:data.sql
   h2:
     console:
       enabled: true
@@ -25,5 +28,3 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto
-
-# 移除Spring AI配置

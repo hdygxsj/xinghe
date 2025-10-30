@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan("com.gf.career.**")
+@MapperScan("com.gf.career.space.mapper")
 public class CareerSpaceApplication {
 
 	public static void main(String[] args) {
