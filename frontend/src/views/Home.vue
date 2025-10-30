@@ -116,7 +116,7 @@
       <el-card>
         <template #header>
           <div class="activity-header">
-            <span>最近活动</span>
+            <span>公司最近活动</span>
           </div>
         </template>
         <el-timeline>
