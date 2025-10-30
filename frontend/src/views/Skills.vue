@@ -7,9 +7,12 @@
 
     <el-tabs v-model="activeTab" @tab-change="handleTabChange">
       <el-tab-pane label="全部技能" name="all"></el-tab-pane>
-      <el-tab-pane label="技术类" name="技术"></el-tab-pane>
-      <el-tab-pane label="管理类" name="管理"></el-tab-pane>
-      <el-tab-pane label="沟通类" name="沟通"></el-tab-pane>
+      <el-tab-pane 
+        v-for="category in skillCategories" 
+        :key="category" 
+        :label="category" 
+        :name="category"
+      ></el-tab-pane>
     </el-tabs>
 
     <el-table :data="filteredSkills" style="width: 100%" v-loading="loading">
@@ -54,8 +57,20 @@
               :key="skill.id"
               :label="skill.name"
               :value="skill.id"
-            ></el-option>
+            >
+              <span>{{ skill.name }}</span>
+              <span style="float: right; color: var(--el-text-color-secondary); font-size: 13px">
+                {{ skill.category }}
+              </span>
+            </el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="类型">
+          <el-input 
+            :value="getSelectedSkillCategory()" 
+            disabled 
+            placeholder="选择技能后自动显示类型"
+          ></el-input>
         </el-form-item>
         <el-form-item label="熟练度">
           <el-rate
@@ -108,6 +123,17 @@ export default {
       acquiredDate: ''
     })
     const isEditing = ref(false)
+
+    // 动态获取所有技能分类
+    const skillCategories = computed(() => {
+      const categories = new Set()
+      allSkills.value.forEach(skill => {
+        if (skill.category) {
+          categories.add(skill.category)
+        }
+      })
+      return Array.from(categories).sort()
+    })
 
     const filteredSkills = computed(() => {
       // 合并员工技能和技能信息
@@ -222,6 +248,14 @@ export default {
       return date.toLocaleDateString('zh-CN')
     }
 
+    const getSelectedSkillCategory = () => {
+      if (!currentEmployeeSkill.value.skillId) {
+        return ''
+      }
+      const skill = allSkills.value.find(s => s.id === currentEmployeeSkill.value.skillId)
+      return skill ? skill.category : ''
+    }
+
     onMounted(() => {
       // Get current user from local storage
       const user = localStorage.getItem('currentUser')
@@ -236,6 +270,7 @@ export default {
       employeeSkills,
       allSkills,
       filteredSkills,
+      skillCategories,
       loading,
       activeTab,
       dialogVisible,
@@ -248,6 +283,7 @@ export default {
       saveSkill,
       deleteSkill,
       formatDate,
+      getSelectedSkillCategory,
       loadEmployeeSkills
     }
   }
