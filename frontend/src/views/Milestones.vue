@@ -85,7 +85,7 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue'
-import { getMilestones, createMilestone, updateMilestone, deleteMilestone } from '@/api/milestone'
+import { getMilestonesByEmployeeId, createMilestone, updateMilestone, deleteMilestone } from '@/api/milestone'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 export default {
@@ -97,13 +97,14 @@ export default {
     const dialogTitle = ref('')
     const currentMilestone = ref({
       id: null,
-      employeeId: 1, // 默认员工ID为1
+      employeeId: null, // 将在加载时设置为当前用户ID
       title: '',
       description: '',
       type: '',
       eventDate: ''
     })
     const isEditing = ref(false)
+    const currentUser = ref(null)
     
     const filteredMilestones = computed(() => {
       if (activeTab.value === 'all') {
@@ -120,7 +121,7 @@ export default {
       dialogTitle.value = '添加里程碑'
       currentMilestone.value = {
         id: null,
-        employeeId: 1, // 默认员工ID为1
+        employeeId: currentUser.value ? currentUser.value.id : null,
         title: '',
         description: '',
         type: '',
@@ -143,6 +144,11 @@ export default {
         const milestoneData = {
           ...currentMilestone.value
         };
+        
+        // 确保员工ID正确
+        if (!milestoneData.employeeId && currentUser.value) {
+          milestoneData.employeeId = currentUser.value.id;
+        }
         
         // 如果是编辑操作，确保ID不为空
         if (isEditing.value && !milestoneData.id) {
@@ -195,8 +201,10 @@ export default {
     
     const loadMilestones = async () => {
       try {
-        const response = await getMilestones()
-        milestones.value = response.data
+        if (currentUser.value && currentUser.value.id) {
+          const response = await getMilestonesByEmployeeId(currentUser.value.id)
+          milestones.value = response.data
+        }
       } catch (error) {
         ElMessage.error('加载里程碑失败')
       }
@@ -209,7 +217,12 @@ export default {
     }
     
     onMounted(() => {
-      loadMilestones()
+      // Get current user from local storage
+      const user = localStorage.getItem('currentUser')
+      if (user) {
+        currentUser.value = JSON.parse(user)
+        loadMilestones()
+      }
     })
     
     return {

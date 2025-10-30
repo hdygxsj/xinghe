@@ -45,4 +45,9 @@ public class CareerInfoController {
     public Map<String, Object> getStatistics() {
         return careerInfoService.getStatistics();
     }
+    
+    @GetMapping("/statistics/{employeeId}")
+    public Map<String, Object> getStatisticsByEmployeeId(@PathVariable Long employeeId) {
+        return careerInfoService.getStatisticsByEmployeeId(employeeId);
+    }
 }

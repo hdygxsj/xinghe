@@ -1,7 +1,7 @@
 <template>
   <div class="career-plans">
     <div class="header-section">
-      <h2>职业规划</h2>
+      <h2>我的职业规划</h2>
       <el-button type="primary" @click="showCreateDialog">制定规划</el-button>
     </div>
 
@@ -108,7 +108,7 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue'
-import { getCareerPlans, createCareerPlan, updateCareerPlan, deleteCareerPlan } from '@/api/careerPlan'
+import { getCareerPlansByEmployeeId, createCareerPlan, updateCareerPlan, deleteCareerPlan } from '@/api/careerPlan'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 export default {
@@ -120,7 +120,9 @@ export default {
     const dialogVisible = ref(false)
     const viewDialogVisible = ref(false)
     const dialogTitle = ref('')
+    const currentUser = ref(null)
     const currentPlan = ref({
+      employeeId: null,
       title: '',
       targetPosition: '',
       targetDate: '',
@@ -139,8 +141,10 @@ export default {
     const loadPlans = async () => {
       loading.value = true
       try {
-        const response = await getCareerPlans()
-        plans.value = response.data
+        if (currentUser.value && currentUser.value.id) {
+          const response = await getCareerPlansByEmployeeId(currentUser.value.id)
+          plans.value = response.data
+        }
       } catch (error) {
         ElMessage.error('加载职业规划列表失败')
       } finally {
@@ -155,6 +159,7 @@ export default {
     const showCreateDialog = () => {
       dialogTitle.value = '制定职业规划'
       currentPlan.value = {
+        employeeId: currentUser.value ? currentUser.value.id : null,
         title: '',
         targetPosition: '',
         targetDate: '',
@@ -179,6 +184,11 @@ export default {
 
     const savePlan = async () => {
       try {
+        // 确保员工ID正确
+        if (!currentPlan.value.employeeId && currentUser.value) {
+          currentPlan.value.employeeId = currentUser.value.id;
+        }
+        
         if (isEditing.value) {
           await updateCareerPlan(currentPlan.value.id, currentPlan.value)
           ElMessage.success('职业规划更新成功')
@@ -242,7 +252,12 @@ export default {
     }
 
     onMounted(() => {
-      loadPlans()
+      // Get current user from local storage
+      const user = localStorage.getItem('currentUser')
+      if (user) {
+        currentUser.value = JSON.parse(user)
+        loadPlans()
+      }
     })
 
     return {
@@ -263,7 +278,8 @@ export default {
       deletePlan,
       formatDate,
       getStatusText,
-      getStatusTagType
+      getStatusTagType,
+      loadPlans
     }
   }
 }

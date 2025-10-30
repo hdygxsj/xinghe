@@ -106,4 +106,26 @@ public class CareerInfoServiceImpl implements CareerInfoService {
         
         return stats;
     }
+    
+    @Override
+    public Map<String, Object> getStatisticsByEmployeeId(Long employeeId) {
+        Map<String, Object> stats = new HashMap<>();
+        
+        // 获取指定员工的里程碑数
+        Long milestoneCount = milestoneService.lambdaQuery()
+            .eq(Milestone::getEmployeeId, employeeId)
+            .count();
+        stats.put("milestoneCount", milestoneCount);
+        
+        // 获取指定员工的证书数
+        Long certificateCount = certificateService.lambdaQuery()
+            .eq(Certificate::getEmployeeId, employeeId)
+            .count();
+        stats.put("certificateCount", certificateCount);
+        
+        // 用户满意度（模拟数据）
+        stats.put("satisfactionRate", 95);
+        
+        return stats;
+    }
 }

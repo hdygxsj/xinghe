@@ -1,7 +1,7 @@
 <template>
   <div class="certificates">
     <div class="header-section">
-      <h2>证书与证明</h2>
+      <h2>我的证书与证明</h2>
       <div class="actions">
         <el-button type="primary" @click="generateAnnualCertificate">年度考核证明</el-button>
         <el-button type="success" @click="generateContactCertificate">在职联系人证明</el-button>
@@ -63,9 +63,6 @@
       width="400px"
     >
       <el-form :model="annualForm" label-width="80px">
-        <el-form-item label="员工ID">
-          <el-input v-model="annualForm.employeeId"></el-input>
-        </el-form-item>
         <el-form-item label="年份">
           <el-select v-model="annualForm.year" placeholder="请选择年份">
             <el-option
@@ -91,11 +88,6 @@
       v-model="contactDialogVisible"
       width="400px"
     >
-      <el-form :model="contactForm" label-width="80px">
-        <el-form-item label="员工ID">
-          <el-input v-model="contactForm.employeeId"></el-input>
-        </el-form-item>
-      </el-form>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="contactDialogVisible = false">取消</el-button>
@@ -132,7 +124,7 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue'
-import { getCertificates, downloadCertificate } from '@/api/certificate'
+import { getCertificatesByEmployeeId, downloadCertificate } from '@/api/certificate'
 import { generateAnnualAssessmentCertificate, generateEmploymentContactCertificate, generateHonorCertificate } from '@/api/careerInfo'
 import { ElMessage } from 'element-plus'
 
@@ -146,12 +138,13 @@ export default {
     const viewDialogVisible = ref(false)
     const selectedCertificate = ref(null)
     const certificateViewUrl = ref('')
+    const currentUser = ref(null)
     const annualForm = ref({
-      employeeId: '1',
+      employeeId: null,
       year: ''
     })
     const contactForm = ref({
-      employeeId: '1'
+      employeeId: null
     })
     const availableYears = ref([])
     
@@ -197,8 +190,13 @@ export default {
     
     const confirmGenerateAnnual = async () => {
       try {
+        if (!currentUser.value || !currentUser.value.id) {
+          ElMessage.error('请先登录')
+          return
+        }
+        
         await generateAnnualAssessmentCertificate(
-          annualForm.value.employeeId,
+          currentUser.value.id,
           annualForm.value.year
         )
         ElMessage.success('年度考核证明生成成功')
@@ -211,7 +209,12 @@ export default {
     
     const confirmGenerateContact = async () => {
       try {
-        await generateEmploymentContactCertificate(contactForm.value.employeeId)
+        if (!currentUser.value || !currentUser.value.id) {
+          ElMessage.error('请先登录')
+          return
+        }
+        
+        await generateEmploymentContactCertificate(currentUser.value.id)
         ElMessage.success('在职联系人证明生成成功')
         contactDialogVisible.value = false
         loadCertificates()
@@ -246,8 +249,10 @@ export default {
     
     const loadCertificates = async () => {
       try {
-        const response = await getCertificates()
-        certificates.value = response.data
+        if (currentUser.value && currentUser.value.id) {
+          const response = await getCertificatesByEmployeeId(currentUser.value.id)
+          certificates.value = response.data
+        }
       } catch (error) {
         ElMessage.error('加载证书失败')
       }
@@ -260,6 +265,15 @@ export default {
     }
     
     onMounted(() => {
+      // Get current user from local storage
+      const user = localStorage.getItem('currentUser')
+      if (user) {
+        currentUser.value = JSON.parse(user)
+        // 设置表单中的员工ID
+        annualForm.value.employeeId = currentUser.value.id
+        contactForm.value.employeeId = currentUser.value.id
+      }
+      
       generateYears()
       loadCertificates()
     })

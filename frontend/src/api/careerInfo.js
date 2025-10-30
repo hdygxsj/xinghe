@@ -37,3 +37,8 @@ export const generateHonorCertificate = (employeeId, honorId) => {
 export const getStatistics = () => {
   return axios.get(`${BASE_URL}/statistics`)
 }
+
+// 根据员工ID获取统计信息
+export const getStatisticsByEmployeeId = (employeeId) => {
+  return axios.get(`${BASE_URL}/statistics/${employeeId}`)
+}

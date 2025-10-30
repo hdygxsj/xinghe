@@ -49,4 +49,11 @@ public interface CareerInfoService {
      * @return 统计信息Map
      */
     Map<String, Object> getStatistics();
+    
+    /**
+     * 获取指定员工的统计信息
+     * @param employeeId 员工ID
+     * @return 统计信息Map
+     */
+    Map<String, Object> getStatisticsByEmployeeId(Long employeeId);
 }

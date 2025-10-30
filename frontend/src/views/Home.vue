@@ -42,28 +42,22 @@
     
     <div class="stats">
       <el-row :gutter="20">
-        <el-col :span="6">
-          <div class="stat-item">
-            <div class="stat-number">{{ statistics.userCount }}</div>
-            <div class="stat-label">注册用户</div>
-          </div>
-        </el-col>
-        <el-col :span="6">
+        <el-col :span="8">
           <div class="stat-item">
             <div class="stat-number">{{ statistics.milestoneCount }}</div>
-            <div class="stat-label">里程碑事件</div>
+            <div class="stat-label">我的里程碑</div>
           </div>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="8">
           <div class="stat-item">
             <div class="stat-number">{{ statistics.certificateCount }}</div>
-            <div class="stat-label">证书证明</div>
+            <div class="stat-label">我的证书</div>
           </div>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="8">
           <div class="stat-item">
             <div class="stat-number">{{ statistics.satisfactionRate }}%</div>
-            <div class="stat-label">用户满意度</div>
+            <div class="stat-label">满意度</div>
           </div>
         </el-col>
       </el-row>
@@ -74,7 +68,7 @@
 <script>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getStatistics } from '@/api/careerInfo'
+import { getStatisticsByEmployeeId } from '@/api/careerInfo'
 import { ElMessage } from 'element-plus'
 import { Document, Medal, Lightning } from '@element-plus/icons-vue'
 
@@ -89,9 +83,8 @@ export default {
     const router = useRouter()
     const currentUser = ref(null)
     const statistics = ref({
-      userCount: 128,
-      milestoneCount: 356,
-      certificateCount: 89,
+      milestoneCount: 0,
+      certificateCount: 0,
       satisfactionRate: 95
     })
 
@@ -101,8 +94,10 @@ export default {
 
     const loadStatistics = async () => {
       try {
-        const response = await getStatistics()
-        statistics.value = response.data
+        if (currentUser.value && currentUser.value.id) {
+          const response = await getStatisticsByEmployeeId(currentUser.value.id)
+          statistics.value = response.data
+        }
       } catch (error) {
         ElMessage.error('加载统计数据失败')
       }
