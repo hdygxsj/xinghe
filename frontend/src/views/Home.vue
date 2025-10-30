@@ -1,8 +1,10 @@
 <template>
   <div class="home">
     <div class="hero">
-      <h1>欢迎来到GF职业空间</h1>
-      <p>记录您的职业成长足迹，规划未来发展路径</p>
+      <h1 v-if="currentUser">欢迎回来, {{ currentUser.name }}!</h1>
+      <h1 v-else>欢迎来到GF职业空间</h1>
+      <p v-if="currentUser">继续记录您的职业成长足迹，规划未来发展路径</p>
+      <p v-else>记录您的职业成长足迹，规划未来发展路径</p>
       <el-button type="primary" size="large" @click="goToMilestones">开始记录</el-button>
     </div>
     
@@ -78,6 +80,21 @@ import { Document, Medal, Lightning } from '@element-plus/icons-vue'
 
 export default {
   name: 'Home',
+  data() {
+    return {
+      currentUser: null
+    }
+  },
+  created() {
+    // Get current user from local storage
+    const user = localStorage.getItem('currentUser')
+    if (user) {
+      this.currentUser = JSON.parse(user)
+    }
+  },
+  methods: {
+    goToMilestones() {
+      this.$router.push('/milestones')
   components: {
     Document,
     Medal,
@@ -91,11 +108,11 @@ export default {
       certificateCount: 0,
       satisfactionRate: 0
     })
-    
+
     const goToMilestones = () => {
       router.push('/milestones')
     }
-    
+
     const loadStatistics = async () => {
       try {
         const response = await getStatistics()
@@ -104,11 +121,11 @@ export default {
         ElMessage.error('加载统计数据失败')
       }
     }
-    
+
     onMounted(() => {
       loadStatistics()
     })
-    
+
     return {
       statistics,
       goToMilestones

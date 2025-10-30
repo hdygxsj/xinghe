@@ -4,7 +4,7 @@
       <el-header class="header">
         <div class="logo">GF职业空间</div>
         <div class="nav">
-          <el-menu mode="horizontal" :default-active="activeIndex" @select="handleSelect">
+          <el-menu mode="horizontal" :default-active="activeIndex" @select="handleSelect" v-if="isLoggedIn">
             <el-menu-item index="1">首页</el-menu-item>
             <el-menu-item index="2">我的历程</el-menu-item>
             <el-menu-item index="3">证书证明</el-menu-item>
@@ -13,6 +13,14 @@
             <el-menu-item index="6">职业规划</el-menu-item>
             <el-menu-item index="7">技能图谱</el-menu-item>
           </el-menu>
+        </div>
+        <div class="user-info" v-if="isLoggedIn">
+          <span>欢迎, {{ currentUser.name }}</span>
+          <el-button @click="handleLogout" type="text">退出</el-button>
+        </div>
+        <div class="auth-buttons" v-else>
+          <el-button @click="goToLogin">登录</el-button>
+          <el-button @click="goToRegister">注册</el-button>
         </div>
       </el-header>
       <el-main>
@@ -31,10 +39,41 @@ import { useRouter } from 'vue-router'
 
 export default {
   name: 'App',
+  data() {
+    return {
+      activeIndex: '1',
+      currentUser: null,
+      isLoggedIn: false
+    }
+  },
+  created() {
+    // Check if user is already logged in
+    const user = localStorage.getItem('currentUser')
+    if (user) {
+      this.currentUser = JSON.parse(user)
+      this.isLoggedIn = true
+    }
+
+    // Redirect to login if not authenticated and trying to access protected routes
+    this.$router.beforeEach((to, from, next) => {
+      const publicPages = ['/login', '/register']
+      const authRequired = !publicPages.includes(to.path)
+      const loggedIn = localStorage.getItem('currentUser')
+
+      if (authRequired && !loggedIn) {
+        return next('/login')
+      }
+
+      next()
+    })
+  },
+  methods: {
+    handleSelect(key) {
+      this.activeIndex = key
   setup() {
     const activeIndex = ref('1')
     const router = useRouter()
-    
+
     const handleSelect = (key) => {
       activeIndex.value = key
       switch (key) {
@@ -60,8 +99,20 @@ export default {
           router.push('/skills')
           break
       }
+    },
+    handleLogout() {
+      localStorage.removeItem('currentUser')
+      this.currentUser = null
+      this.isLoggedIn = false
+      this.$router.push('/login')
+    },
+    goToLogin() {
+      this.$router.push('/login')
+    },
+    goToRegister() {
+      this.$router.push('/register')
     }
-    
+
     return {
       activeIndex,
       handleSelect
@@ -88,6 +139,17 @@ export default {
 .nav {
   flex-grow: 1;
   margin-left: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 10px;
 }
 
 .footer {

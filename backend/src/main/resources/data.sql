@@ -1,10 +1,12 @@
 -- 初始化员工数据
-INSERT INTO employee (employee_id, name, department, position, hire_date, email, phone) VALUES
-('1', '张三', '技术部', '高级工程师', '2020-01-15 09:00:00', 'zhangsan@company.com', '13800138001'),
-('2', '李四', '市场部', '市场经理', '2019-03-22 09:00:00', 'lisi@company.com', '13800138002'),
-('3', '王五', '人事部', 'HR专员', '2021-07-10 09:00:00', 'wangwu@company.com', '13800138003');
+-- Password for all users is "password123" (bcrypt hashed)
+INSERT INTO employee (employee_id, name, department, position, hire_date, email, phone, username, password) VALUES
+('EMP001', '张三', '技术部', '高级工程师', '2020-01-15 09:00:00', 'zhangsan@company.com', '13800138001', 'zhangsan', '$2a$10$jSgB9VADh8Uh8D0JFSMPgOtOReFiNkE9aO2L50yNIzLHyXy8h20Sm'),
+('EMP002', '李四', '市场部', '市场经理', '2019-03-22 09:00:00', 'lisi@company.com', '13800138002', 'lisi', '$2a$10$jSgB9VADh8Uh8D0JFSMPgOtOReFiNkE9aO2L50yNIzLHyXy8h20Sm'),
+('EMP003', '王五', '人事部', 'HR专员', '2021-07-10 09:00:00', 'wangwu@company.com', '13800138003', 'wangwu', '$2a$10$jSgB9VADh8Uh8D0JFSMPgOtOReFiNkE9aO2L50yNIzLHyXy8h20Sm');
 
 -- 初始化里程碑数据
+-- Update employee_id references to match the new employee IDs
 INSERT INTO milestone (employee_id, title, description, type, event_date) VALUES
 (1, '入职培训完成', '完成了新员工入职培训', '入职培训', '2020-01-15 17:00:00'),
 (1, '转正', '通过试用期考核，正式转正', '转正', '2020-04-15 00:00:00'),
@@ -14,6 +16,7 @@ INSERT INTO milestone (employee_id, title, description, type, event_date) VALUES
 (3, '入职培训完成', '完成了新员工入职培训', '入职培训', '2021-07-10 17:00:00');
 
 -- 初始化证书数据
+-- Update employee_id references to match the new employee IDs
 INSERT INTO certificate (employee_id, certificate_type, title, description, issue_date, issuer) VALUES
 (1, '年度考核证明', '2021年度考核证明', '该员工在2021年度表现优秀，考核结果为合格', '2022-01-15 00:00:00', '人力资源部'),
 (1, '荣誉证明', '优秀员工奖', '获得2021年度优秀员工奖', '2022-01-20 00:00:00', '人力资源部'),
