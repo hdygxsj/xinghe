@@ -21,3 +21,8 @@ export const updateEmployee = (id, employeeData) => {
 export const deleteEmployee = (id) => {
   return apiClient.delete(`${BASE_URL}/${id}`)
 }
+
+// 更新员工角色
+export const updateEmployeeRole = (id, role) => {
+  return apiClient.patch(`${BASE_URL}/${id}/role`, { role })
+}
