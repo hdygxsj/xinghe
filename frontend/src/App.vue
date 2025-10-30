@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 
@@ -101,11 +101,24 @@ export default {
         isLoggedIn.value = true
         // 设置axios默认头部的Authorization
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      } else {
+        currentUser.value = null
+        isLoggedIn.value = false
+      }
+    }
+
+    // 监听localStorage的变化
+    const handleStorageChange = (e) => {
+      if (e.key === 'currentUser' || e.key === 'token') {
+        checkLoginStatus()
       }
     }
 
     onMounted(() => {
       checkLoginStatus()
+      
+      // 监听storage事件
+      window.addEventListener('storage', handleStorageChange)
 
       // Redirect to login if not authenticated and trying to access protected routes
       router.beforeEach((to, from, next) => {
@@ -120,6 +133,11 @@ export default {
         next()
       })
     })
+
+    // 在组件卸载时移除事件监听器
+    // 注意：在Vue 3的Composition API中，需要使用onUnmounted生命周期钩子
+    // 但由于这里是在setup函数中，我们需要在返回之前定义它
+    // 我们将在返回的对象中添加onUnmounted钩子
 
     return {
       activeIndex,

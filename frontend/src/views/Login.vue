@@ -125,6 +125,13 @@ export default {
               // 保存用户信息和token到本地存储
               localStorage.setItem('currentUser', JSON.stringify(data))
               localStorage.setItem('token', token)
+              
+              // 手动触发storage事件，通知其他组件登录状态已改变
+              window.dispatchEvent(new StorageEvent('storage', {
+                key: 'currentUser',
+                newValue: JSON.stringify(data)
+              }))
+              
               ElMessage.success('登录成功')
               // 跳转到首页
               router.push('/')
