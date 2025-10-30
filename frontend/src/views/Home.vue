@@ -1,8 +1,10 @@
 <template>
   <div class="home">
     <div class="hero">
-      <h1>欢迎来到GF职业空间</h1>
-      <p>记录您的职业成长足迹，规划未来发展路径</p>
+      <h1 v-if="currentUser">欢迎回来, {{ currentUser.name }}!</h1>
+      <h1 v-else>欢迎来到GF职业空间</h1>
+      <p v-if="currentUser">继续记录您的职业成长足迹，规划未来发展路径</p>
+      <p v-else>记录您的职业成长足迹，规划未来发展路径</p>
       <el-button type="primary" size="large" @click="goToMilestones">开始记录</el-button>
     </div>
     
@@ -85,17 +87,18 @@ export default {
   },
   setup() {
     const router = useRouter()
+    const currentUser = ref(null)
     const statistics = ref({
-      userCount: 0,
-      milestoneCount: 0,
-      certificateCount: 0,
-      satisfactionRate: 0
+      userCount: 128,
+      milestoneCount: 356,
+      certificateCount: 89,
+      satisfactionRate: 95
     })
-    
+
     const goToMilestones = () => {
       router.push('/milestones')
     }
-    
+
     const loadStatistics = async () => {
       try {
         const response = await getStatistics()
@@ -104,12 +107,19 @@ export default {
         ElMessage.error('加载统计数据失败')
       }
     }
-    
+
     onMounted(() => {
+      // Get current user from local storage
+      const user = localStorage.getItem('currentUser')
+      if (user) {
+        currentUser.value = JSON.parse(user)
+      }
+      
       loadStatistics()
     })
-    
+
     return {
+      currentUser,
       statistics,
       goToMilestones
     }
