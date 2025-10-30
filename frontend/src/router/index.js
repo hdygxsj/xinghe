@@ -8,6 +8,7 @@ import Register from '../views/Register.vue'
 import Mentors from '../views/Mentors.vue'
 import CareerPlans from '../views/CareerPlans.vue'
 import Skills from '../views/Skills.vue'
+import Roles from '../views/Roles.vue'
 
 const routes = [
   {
@@ -54,6 +55,12 @@ const routes = [
     path: '/skills',
     name: 'Skills',
     component: Skills
+  },
+  {
+    path: '/roles',
+    name: 'Roles',
+    component: Roles,
+    meta: { requiresAdmin: true }
   }
 ]
 

@@ -12,6 +12,7 @@
             <el-menu-item index="5">导师管理</el-menu-item>
             <el-menu-item index="6">职业规划</el-menu-item>
             <el-menu-item index="7">技能管理</el-menu-item>
+            <el-menu-item index="8" v-if="isAdmin">角色管理</el-menu-item>
           </el-menu>
         </div>
         <div class="user-info" v-if="isLoggedIn">
@@ -44,6 +45,7 @@ export default {
     const activeIndex = ref('1')
     const currentUser = ref(null)
     const isLoggedIn = ref(false)
+    const isAdmin = ref(false)
     const router = useRouter()
 
     const handleSelect = (key) => {
@@ -69,6 +71,9 @@ export default {
           break
         case '7':
           router.push('/skills')
+          break
+        case '8':
+          router.push('/roles')
           break
       }
     }
@@ -99,11 +104,13 @@ export default {
       if (user && token) {
         currentUser.value = JSON.parse(user)
         isLoggedIn.value = true
+        isAdmin.value = currentUser.value.role === 'ADMIN'
         // 设置axios默认头部的Authorization
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
       } else {
         currentUser.value = null
         isLoggedIn.value = false
+        isAdmin.value = false
       }
     }
 
@@ -143,6 +150,7 @@ export default {
       activeIndex,
       currentUser,
       isLoggedIn,
+      isAdmin,
       handleSelect,
       handleLogout,
       goToLogin,

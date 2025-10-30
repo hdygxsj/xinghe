@@ -8,29 +8,17 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("employee")
-public class Employee {
+@TableName("role")
+public class Role {
     @TableId(type = IdType.AUTO)
     private Long id;
-    private String employeeId;
-    private String name;
-    private String department;
-    private String position;
     
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime hireDate;
-    
-    private String email;
-    private String phone;
+    private String roleName;
+    private String description;
     
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
     
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
-    
-    // Authentication fields
-    private String username;
-    private String password;
-    private String role; // ADMIN, USER, MANAGER
 }
