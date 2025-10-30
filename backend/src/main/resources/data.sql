@@ -1,8 +1,8 @@
 -- 初始化员工数据
 INSERT INTO employee (employee_id, name, department, position, hire_date, email, phone) VALUES
-(1, '张三', '技术部', '高级工程师', '2020-01-15 09:00:00', 'zhangsan@company.com', '13800138001'),
-(1, '李四', '市场部', '市场经理', '2019-03-22 09:00:00', 'lisi@company.com', '13800138002'),
-(1, '王五', '人事部', 'HR专员', '2021-07-10 09:00:00', 'wangwu@company.com', '13800138003');
+('1', '张三', '技术部', '高级工程师', '2020-01-15 09:00:00', 'zhangsan@company.com', '13800138001'),
+('2', '李四', '市场部', '市场经理', '2019-03-22 09:00:00', 'lisi@company.com', '13800138002'),
+('3', '王五', '人事部', 'HR专员', '2021-07-10 09:00:00', 'wangwu@company.com', '13800138003');
 
 -- 初始化里程碑数据
 INSERT INTO milestone (employee_id, title, description, type, event_date) VALUES
