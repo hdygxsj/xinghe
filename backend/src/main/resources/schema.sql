@@ -1,0 +1,42 @@
+-- 员工表
+CREATE TABLE IF NOT EXISTS employee (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    employee_id VARCHAR(50) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
+    department VARCHAR(100),
+    position VARCHAR(100),
+    hire_date DATETIME,
+    email VARCHAR(100),
+    phone VARCHAR(20),
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 里程碑表
+CREATE TABLE IF NOT EXISTS milestone (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    employee_id BIGINT NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    description TEXT,
+    type VARCHAR(50) NOT NULL,
+    event_date DATETIME,
+    attachment_url VARCHAR(500),
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (employee_id) REFERENCES employee(id) ON DELETE CASCADE
+);
+
+-- 证书表
+CREATE TABLE IF NOT EXISTS certificate (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    employee_id BIGINT NOT NULL,
+    certificate_type VARCHAR(100) NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    description TEXT,
+    issue_date DATETIME,
+    issuer VARCHAR(100),
+    certificate_url VARCHAR(500),
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (employee_id) REFERENCES employee(id) ON DELETE CASCADE
+);
