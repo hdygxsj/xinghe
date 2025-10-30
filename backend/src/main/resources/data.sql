@@ -4,12 +4,12 @@ INSERT INTO employee (employee_id, name, department, position, hire_date, email,
 ('ADMIN001', '管理员', '管理部', '系统管理员', '2020-01-01 09:00:00', 'admin@company.com', '13800138000', 'admin', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a', 'ADMIN'),
 ('1', '张三', '技术部', '高级工程师', '2020-01-15 09:00:00', 'zhangsan@company.com', '13800138001', 'zhangsan', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a', 'USER'),
 ('2', '李四', '市场部', '市场经理', '2019-03-22 09:00:00', 'lisi@company.com', '13800138002', 'lisi', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a', 'USER'),
-('3', '王五', '人事部', 'HR专员', '2021-07-10 09:00:00', 'wangwu@company.com', '13800138003', 'wangwu', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a', 'USER');
-('4', '王五', '人事部', 'HR专员', '2021-07-10 09:00:00', 'wangwu@company.com', '13800138003', 'wangwu', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a', 'USER');
-('5', '吴九', '人事部', 'HR专员', '2021-07-10 09:00:00', 'wangwu@company.com', '13800138003', 'wujiu', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a', 'USER');
-('6', '赵六', '人事部', 'HR专员', '2021-07-10 09:00:00', 'wangwu@company.com', '13800138003', 'zhaoliu', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a', 'USER');
-('7', '孙七', '人事部', 'HR专员', '2021-07-10 09:00:00', 'wangwu@company.com', '13800138003', 'sunqi', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a', 'USER');
-('8', '周七', '人事部', 'HR专员', '2021-07-10 09:00:00', 'wangwu@company.com', '13800138003', 'zhouba', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a', 'USER');
+('3', '王五', '人事部', 'HR专员', '2021-07-10 09:00:00', 'wangwu@company.com', '13800138003', 'wangwu', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a', 'USER'),
+('4', '嘻嘻', '人事部', 'HR专员', '2021-07-10 09:00:00', 'xixi@company.com', '13800138003', 'xixi', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a', 'USER'),
+('5', '吴九', '人事部', 'HR专员', '2021-07-10 09:00:00', 'wujiu@company.com', '13800138003', 'wujiu', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a', 'USER'),
+('6', '赵六', '人事部', 'HR专员', '2021-07-10 09:00:00', 'zhaoliu@company.com', '13800138003', 'zhaoliu', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a', 'USER'),
+('7', '孙七', '人事部', 'HR专员', '2021-07-10 09:00:00', 'sunqi@company.com', '13800138003', 'sunqi', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a', 'USER'),
+('8', '周七', '人事部', 'HR专员', '2021-07-10 09:00:00', 'zhouba@company.com', '13800138003', 'zhouba', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a', 'USER');
 
 
 -- 初始化里程碑数据

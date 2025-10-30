@@ -9,6 +9,7 @@ import Mentors from '../views/Mentors.vue'
 import CareerPlans from '../views/CareerPlans.vue'
 import Skills from '../views/Skills.vue'
 import Roles from '../views/Roles.vue'
+import HRDashboard from '../views/HRDashboard.vue'
 
 const routes = [
   {
@@ -60,6 +61,12 @@ const routes = [
     path: '/roles',
     name: 'Roles',
     component: Roles,
+    meta: { requiresAdmin: true }
+  },
+  {
+    path: '/hr-dashboard',
+    name: 'HRDashboard',
+    component: HRDashboard,
     meta: { requiresAdmin: true }
   }
 ]

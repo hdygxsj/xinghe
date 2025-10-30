@@ -133,8 +133,12 @@ export default {
               }))
               
               ElMessage.success('登录成功')
-              // 跳转到首页
-              router.push('/')
+              // 根据用户角色跳转到不同页面
+              if (data.role === 'ADMIN') {
+                router.push('/hr-dashboard')
+              } else {
+                router.push('/')
+              }
             } else {
               ElMessage.error(message || '登录失败')
             }
