@@ -1,9 +1,10 @@
 -- 初始化员工数据
 -- 使用SM3哈希密码 (password -> 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8)
-INSERT INTO employee (employee_id, name, department, position, hire_date, email, phone, username, password) VALUES
-('1', '张三', '技术部', '高级工程师', '2020-01-15 09:00:00', 'zhangsan@company.com', '13800138001', 'zhangsan', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a'),
-('2', '李四', '市场部', '市场经理', '2019-03-22 09:00:00', 'lisi@company.com', '13800138002', 'lisi', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a'),
-('3', '王五', '人事部', 'HR专员', '2021-07-10 09:00:00', 'wangwu@company.com', '13800138003', 'wangwu', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a');
+INSERT INTO employee (employee_id, name, department, position, hire_date, email, phone, username, password, role) VALUES
+('ADMIN001', '管理员', '管理部', '系统管理员', '2020-01-01 09:00:00', 'admin@company.com', '13800138000', 'admin', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a', 'ADMIN'),
+('1', '张三', '技术部', '高级工程师', '2020-01-15 09:00:00', 'zhangsan@company.com', '13800138001', 'zhangsan', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a', 'USER'),
+('2', '李四', '市场部', '市场经理', '2019-03-22 09:00:00', 'lisi@company.com', '13800138002', 'lisi', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a', 'USER'),
+('3', '王五', '人事部', 'HR专员', '2021-07-10 09:00:00', 'wangwu@company.com', '13800138003', 'wangwu', '2d31559bd1c4a05661c984d1c50a22ae2df2323d64756569e40b3e2f8e24884a', 'USER');
 
 -- 初始化里程碑数据
 INSERT INTO milestone (employee_id, title, description, type, event_date) VALUES
@@ -54,3 +55,9 @@ INSERT INTO mentorship (mentor_id, mentee_id, status, goals, start_date) VALUES
 INSERT INTO career_plan (employee_id, title, description, target_position, target_date, status) VALUES
 (1, '技术专家发展路径', '计划在3年内成为技术专家', '技术专家', '2025-01-15 00:00:00', 'ACTIVE'),
 (2, '市场总监发展路径', '计划在5年内成为市场总监', '市场总监', '2026-03-22 00:00:00', 'ACTIVE');
+
+-- 初始化角色数据
+INSERT INTO role (role_name, description) VALUES
+('ADMIN', '系统管理员，拥有所有权限'),
+('USER', '普通用户，只能管理自己的数据'),
+('MANAGER', '管理者，可以管理部门员工');

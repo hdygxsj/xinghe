@@ -56,7 +56,7 @@
             type="date"
             placeholder="选择日期"
             format="YYYY-MM-DD"
-            value-format="YYYY-MM-DD"
+            value-format="YYYY-MM-DD 00:00:00"
           ></el-date-picker>
         </el-form-item>
         <el-form-item label="状态">

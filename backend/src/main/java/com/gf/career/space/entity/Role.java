@@ -8,19 +8,13 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("career_plan")
-public class CareerPlan {
+@TableName("role")
+public class Role {
     @TableId(type = IdType.AUTO)
     private Long id;
-    private Long employeeId;
-    private String title;
+    
+    private String roleName;
     private String description;
-    private String targetPosition;
-    
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime targetDate;
-    
-    private String status; // DRAFT, ACTIVE, COMPLETED, CANCELLED
     
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
