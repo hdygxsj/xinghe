@@ -2,7 +2,6 @@ package com.gf.career.space.service;
 
 import com.gf.career.space.entity.Certificate;
 import com.gf.career.space.entity.Employee;
-import com.lowagie.text.DocumentException;
 import com.lowagie.text.pdf.BaseFont;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

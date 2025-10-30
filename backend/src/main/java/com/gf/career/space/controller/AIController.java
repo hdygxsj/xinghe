@@ -2,13 +2,16 @@ package com.gf.career.space.controller;
 
 import com.gf.career.space.entity.Employee;
 import com.gf.career.space.entity.Milestone;
-import com.gf.career.space.entity.Skill;
 import com.gf.career.space.service.EmployeeService;
 import com.gf.career.space.service.MilestoneService;
 import com.gf.career.space.service.SkillService;
 import com.gf.career.space.util.UserContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.List;
