@@ -165,7 +165,7 @@ public class CareerPlanController {
                 return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "删除失败"));
             }
         } catch (Exception e) {
-            logger.error("删除职业规划时发生错误，ID: " + id, e);
+            logger.error("删除职业规划时发生错误，ID: {}", id, e);
             return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "删除失败: " + e.getMessage()));
         }
     }

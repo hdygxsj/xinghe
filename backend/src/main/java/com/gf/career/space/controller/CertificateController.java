@@ -208,7 +208,7 @@ public class CertificateController {
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
-            logger.error("下载证书时发生错误，ID: " + id, e);
+            logger.error("下载证书时发生错误，ID: {}", id, e);
             return ResponseEntity.badRequest().body(new byte[0]);
         }
     }
