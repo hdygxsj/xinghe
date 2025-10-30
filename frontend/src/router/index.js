@@ -3,6 +3,9 @@ import Home from '../views/Home.vue'
 import Milestones from '../views/Milestones.vue'
 import Certificates from '../views/Certificates.vue'
 import AIAssistant from '../views/AIAssistant.vue'
+import Mentors from '../views/Mentors.vue'
+import CareerPlans from '../views/CareerPlans.vue'
+import Skills from '../views/Skills.vue'
 
 const routes = [
   {
@@ -24,6 +27,21 @@ const routes = [
     path: '/ai-assistant',
     name: 'AIAssistant',
     component: AIAssistant
+  },
+  {
+    path: '/mentors',
+    name: 'Mentors',
+    component: Mentors
+  },
+  {
+    path: '/career-plans',
+    name: 'CareerPlans',
+    component: CareerPlans
+  },
+  {
+    path: '/skills',
+    name: 'Skills',
+    component: Skills
   }
 ]
 

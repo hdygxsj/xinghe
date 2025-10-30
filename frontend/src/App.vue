@@ -9,6 +9,9 @@
             <el-menu-item index="2">我的历程</el-menu-item>
             <el-menu-item index="3">证书证明</el-menu-item>
             <el-menu-item index="4">智能助手</el-menu-item>
+            <el-menu-item index="5">导师管理</el-menu-item>
+            <el-menu-item index="6">职业规划</el-menu-item>
+            <el-menu-item index="7">技能图谱</el-menu-item>
           </el-menu>
         </div>
       </el-header>
@@ -46,6 +49,15 @@ export default {
           break
         case '4':
           router.push('/ai-assistant')
+          break
+        case '5':
+          router.push('/mentors')
+          break
+        case '6':
+          router.push('/career-plans')
+          break
+        case '7':
+          router.push('/skills')
           break
       }
     }
