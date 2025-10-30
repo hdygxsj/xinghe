@@ -23,30 +23,36 @@
 </template>
 
 <script>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
 export default {
   name: 'App',
-  data() {
-    return {
-      activeIndex: '1'
-    }
-  },
-  methods: {
-    handleSelect(key) {
-      this.activeIndex = key
+  setup() {
+    const activeIndex = ref('1')
+    const router = useRouter()
+    
+    const handleSelect = (key) => {
+      activeIndex.value = key
       switch (key) {
         case '1':
-          this.$router.push('/')
+          router.push('/')
           break
         case '2':
-          this.$router.push('/milestones')
+          router.push('/milestones')
           break
         case '3':
-          this.$router.push('/certificates')
+          router.push('/certificates')
           break
         case '4':
-          this.$router.push('/ai-assistant')
+          router.push('/ai-assistant')
           break
       }
+    }
+    
+    return {
+      activeIndex,
+      handleSelect
     }
   }
 }

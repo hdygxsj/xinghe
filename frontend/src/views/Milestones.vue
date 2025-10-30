@@ -24,7 +24,9 @@
           placement="top"
         >
           <el-card>
-            <h4>{{ milestone.title }}</h4>
+            <template #header>
+              <h4>{{ milestone.title }}</h4>
+            </template>
             <p>{{ milestone.description }}</p>
             <div class="milestone-footer">
               <span class="milestone-type">{{ milestone.type }}</span>
@@ -82,70 +84,122 @@
 </template>
 
 <script>
+import { ref, computed, onMounted } from 'vue'
+import { getMilestones, createMilestone, updateMilestone, deleteMilestone } from '@/api/milestone'
+import { ElMessage, ElMessageBox } from 'element-plus'
+
 export default {
   name: 'Milestones',
-  data() {
-    return {
-      activeTab: 'all',
-      milestones: [],
-      dialogVisible: false,
-      dialogTitle: '',
-      currentMilestone: {
-        id: null,
-        title: '',
-        description: '',
-        type: '',
-        eventDate: ''
-      },
-      isEditing: false
-    }
-  },
-  computed: {
-    filteredMilestones() {
-      if (this.activeTab === 'all') {
-        return this.milestones
-      }
-      return this.milestones.filter(m => m.type === this.activeTab)
-    }
-  },
-  methods: {
-    handleTabChange(tab) {
-      this.activeTab = tab
-    },
+  setup() {
+    const activeTab = ref('all')
+    const milestones = ref([])
+    const dialogVisible = ref(false)
+    const dialogTitle = ref('')
+    const currentMilestone = ref({
+      id: null,
+      title: '',
+      description: '',
+      type: '',
+      eventDate: ''
+    })
+    const isEditing = ref(false)
     
-    showAddDialog() {
-      this.dialogTitle = '添加里程碑'
-      this.currentMilestone = {
+    const filteredMilestones = computed(() => {
+      if (activeTab.value === 'all') {
+        return milestones.value
+      }
+      return milestones.value.filter(m => m.type === activeTab.value)
+    })
+    
+    const handleTabChange = (tab) => {
+      activeTab.value = tab
+    }
+    
+    const showAddDialog = () => {
+      dialogTitle.value = '添加里程碑'
+      currentMilestone.value = {
         id: null,
         title: '',
         description: '',
         type: '',
         eventDate: ''
       }
-      this.isEditing = false
-      this.dialogVisible = true
-    },
+      isEditing.value = false
+      dialogVisible.value = true
+    }
     
-    editMilestone(milestone) {
-      this.dialogTitle = '编辑里程碑'
-      this.currentMilestone = { ...milestone }
-      this.isEditing = true
-      this.dialogVisible = true
-    },
+    const editMilestone = (milestone) => {
+      dialogTitle.value = '编辑里程碑'
+      currentMilestone.value = { ...milestone }
+      isEditing.value = true
+      dialogVisible.value = true
+    }
     
-    saveMilestone() {
-      this.dialogVisible = false
-      // 这里应该调用API保存数据
-    },
+    const saveMilestone = async () => {
+      try {
+        if (isEditing.value) {
+          await updateMilestone(currentMilestone.value.id, currentMilestone.value)
+          ElMessage.success('更新成功')
+        } else {
+          await createMilestone(currentMilestone.value)
+          ElMessage.success('创建成功')
+        }
+        dialogVisible.value = false
+        loadMilestones()
+      } catch (error) {
+        ElMessage.error('保存失败')
+      }
+    }
     
-    deleteMilestone(id) {
-      // 这里应该调用API删除数据
-    },
+    const deleteMilestone = async (id) => {
+      try {
+        await ElMessageBox.confirm('确认删除该里程碑吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+        await deleteMilestone(id)
+        ElMessage.success('删除成功')
+        loadMilestones()
+      } catch (error) {
+        ElMessage.error('删除失败')
+      }
+    }
     
-    formatDate(dateString) {
+    const loadMilestones = async () => {
+      try {
+        const response = await getMilestones()
+        milestones.value = response.data
+      } catch (error) {
+        ElMessage.error('加载里程碑失败')
+      }
+    }
+    
+    const formatDate = (dateString) => {
       if (!dateString) return ''
       const date = new Date(dateString)
       return date.toLocaleDateString('zh-CN')
+    }
+    
+    onMounted(() => {
+      loadMilestones()
+    })
+    
+    return {
+      activeTab,
+      milestones,
+      dialogVisible,
+      dialogTitle,
+      currentMilestone,
+      isEditing,
+      filteredMilestones,
+      handleTabChange,
+      showAddDialog,
+      editMilestone,
+      saveMilestone,
+      deleteMilestone,
+      formatDate,
+      loadMilestones
     }
   }
 }

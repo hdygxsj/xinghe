@@ -11,7 +11,7 @@
         <el-col :span="8">
           <div class="feature-card">
             <div class="feature-icon">
-              <i class="el-icon-document"></i>
+              <el-icon><document /></el-icon>
             </div>
             <h3>历程记录</h3>
             <p>记录入职培训、转正、晋升等重要时刻</p>
@@ -20,7 +20,7 @@
         <el-col :span="8">
           <div class="feature-card">
             <div class="feature-icon">
-              <i class="el-icon-medal"></i>
+              <el-icon><medal /></el-icon>
             </div>
             <h3>证书管理</h3>
             <p>管理各类证明文件和荣誉证书</p>
@@ -29,7 +29,7 @@
         <el-col :span="8">
           <div class="feature-card">
             <div class="feature-icon">
-              <i class="el-icon-lightning"></i>
+              <el-icon><lightning /></el-icon>
             </div>
             <h3>智能助手</h3>
             <p>AI驱动的职业发展建议和学习路径</p>
@@ -70,11 +70,19 @@
 </template>
 
 <script>
+import { useRouter } from 'vue-router'
+
 export default {
   name: 'Home',
-  methods: {
-    goToMilestones() {
-      this.$router.push('/milestones')
+  setup() {
+    const router = useRouter()
+    
+    const goToMilestones = () => {
+      router.push('/milestones')
+    }
+    
+    return {
+      goToMilestones
     }
   }
 }

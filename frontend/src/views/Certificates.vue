@@ -107,92 +107,171 @@
 </template>
 
 <script>
+import { ref, computed, onMounted } from 'vue'
+import { getCertificates } from '@/api/certificate'
+import { generateAnnualAssessmentCertificate, generateEmploymentContactCertificate, generateHonorCertificate } from '@/api/careerInfo'
+import { ElMessage } from 'element-plus'
+
 export default {
   name: 'Certificates',
-  data() {
-    return {
-      activeTab: 'all',
-      certificates: [],
-      annualDialogVisible: false,
-      contactDialogVisible: false,
-      annualForm: {
-        employeeId: '',
-        year: ''
-      },
-      contactForm: {
-        employeeId: ''
-      },
-      availableYears: []
-    }
-  },
-  computed: {
-    filteredCertificates() {
-      if (this.activeTab === 'all') {
-        return this.certificates
-      }
-      return this.certificates.filter(c => c.certificateType === this.activeTab)
-    }
-  },
-  methods: {
-    handleTabChange(tab) {
-      this.activeTab = tab
-    },
+  setup() {
+    const activeTab = ref('all')
+    const certificates = ref([])
+    const annualDialogVisible = ref(false)
+    const contactDialogVisible = ref(false)
+    const annualForm = ref({
+      employeeId: '',
+      year: ''
+    })
+    const contactForm = ref({
+      employeeId: ''
+    })
+    const availableYears = ref([])
     
-    getTagType(type) {
+    const filteredCertificates = computed(() => {
+      if (activeTab.value === 'all') {
+        return certificates.value
+      }
+      return certificates.value.filter(c => c.certificateType === activeTab.value)
+    })
+    
+    const handleTabChange = (tab) => {
+      activeTab.value = tab
+    }
+    
+    const getTagType = (type) => {
       const typeMap = {
         '年度考核证明': 'primary',
         '在职联系人证明': 'success',
         '荣誉证明': 'warning'
       }
       return typeMap[type] || 'info'
-    },
+    }
     
-    generateYears() {
+    const generateYears = () => {
       const currentYear = new Date().getFullYear()
-      this.availableYears = []
+      availableYears.value = []
       for (let i = currentYear - 5; i <= currentYear; i++) {
-        this.availableYears.push(i)
+        availableYears.value.push(i)
       }
-    },
+    }
     
-    generateAnnualCertificate() {
-      this.annualDialogVisible = true
-    },
+    const generateAnnualCertificate = () => {
+      annualDialogVisible.value = true
+    }
     
-    generateContactCertificate() {
-      this.contactDialogVisible = true
-    },
+    const generateContactCertificate = () => {
+      contactDialogVisible.value = true
+    }
     
-    generateHonorCertificate() {
-      this.$message.info('请选择一个荣誉里程碑来生成证明')
-    },
+    const generateHonorCertificate = () => {
+      ElMessage.info('请选择一个荣誉里程碑来生成证明')
+    }
     
-    confirmGenerateAnnual() {
-      this.annualDialogVisible = false
-      // 这里应该调用API生成证书
-    },
+    const confirmGenerateAnnual = async () => {
+      try {
+        await generateAnnualAssessmentCertificate(
+          annualForm.value.employeeId,
+          annualForm.value.year
+        )
+        ElMessage.success('年度考核证明生成成功')
+        annualDialogVisible.value = false
+        loadCertificates()
+      } catch (error) {
+        ElMessage.error('生成失败')
+      }
+    }
     
-    confirmGenerateContact() {
-      this.contactDialogVisible = false
-      // 这里应该调用API生成证书
-    },
+    const confirmGenerateContact = async () => {
+      try {
+        await generateEmploymentContactCertificate(contactForm.value.employeeId)
+        ElMessage.success('在职联系人证明生成成功')
+        contactDialogVisible.value = false
+        loadCertificates()
+      } catch (error) {
+        ElMessage.error('生成失败')
+      }
+    }
     
-    downloadCertificate(certificate) {
-      this.$message.success(`开始下载证书: ${certificate.title}`)
-    },
+    const downloadCertificate = (certificate) => {
+      // 模拟下载证书
+      if (certificate.certificateUrl) {
+        // 如果有证书URL，则下载文件
+        const link = document.createElement('a')
+        link.href = certificate.certificateUrl
+        link.download = `${certificate.title}.pdf`
+        link.click()
+        ElMessage.success(`开始下载证书: ${certificate.title}`)
+      } else {
+        // 如果没有证书URL，则提供模拟下载
+        const content = `证书标题: ${certificate.title}
+证书类型: ${certificate.certificateType}
+颁发日期: ${formatDate(certificate.issueDate)}
+颁发机构: ${certificate.issuer}
+描述: ${certificate.description}`
+        const blob = new Blob([content], { type: 'text/plain' })
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `${certificate.title}.txt`
+        link.click()
+        window.URL.revokeObjectURL(url)
+        ElMessage.success(`开始下载证书: ${certificate.title}`)
+      }
+    }
     
-    viewCertificate(certificate) {
-      this.$message.success(`查看证书: ${certificate.title}`)
-    },
+    const viewCertificate = (certificate) => {
+      // 模拟查看证书
+      if (certificate.certificateUrl) {
+        // 如果有证书URL，则在新窗口中打开
+        window.open(certificate.certificateUrl, '_blank')
+      } else {
+        // 如果没有证书URL，则显示证书信息
+        ElMessage.info(`证书信息: ${certificate.title} - ${certificate.description}`)
+      }
+    }
     
-    formatDate(dateString) {
+    const loadCertificates = async () => {
+      try {
+        const response = await getCertificates()
+        certificates.value = response.data
+      } catch (error) {
+        ElMessage.error('加载证书失败')
+      }
+    }
+    
+    const formatDate = (dateString) => {
       if (!dateString) return ''
       const date = new Date(dateString)
       return date.toLocaleDateString('zh-CN')
     }
-  },
-  mounted() {
-    this.generateYears()
+    
+    onMounted(() => {
+      generateYears()
+      loadCertificates()
+    })
+    
+    return {
+      activeTab,
+      certificates,
+      annualDialogVisible,
+      contactDialogVisible,
+      annualForm,
+      contactForm,
+      availableYears,
+      filteredCertificates,
+      handleTabChange,
+      getTagType,
+      generateAnnualCertificate,
+      generateContactCertificate,
+      generateHonorCertificate,
+      confirmGenerateAnnual,
+      confirmGenerateContact,
+      downloadCertificate,
+      viewCertificate,
+      formatDate,
+      loadCertificates
+    }
   }
 }
 </script>
