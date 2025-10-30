@@ -38,6 +38,10 @@ CREATE TABLE IF NOT EXISTS certificate (
     issue_date DATETIME,
     issuer VARCHAR(100),
     certificate_url VARCHAR(500),
+    verification_code VARCHAR(20),
+    status VARCHAR(20) DEFAULT 'ACTIVE',
+    expiry_date DATETIME,
+    tags VARCHAR(500),
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (employee_id) REFERENCES employee(id) ON DELETE CASCADE
