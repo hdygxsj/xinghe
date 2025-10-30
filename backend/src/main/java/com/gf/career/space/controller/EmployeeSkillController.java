@@ -13,12 +13,16 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/employee-skills")
 public class EmployeeSkillController {
+
+    private static final Logger logger = LoggerFactory.getLogger(EmployeeSkillController.class);
 
     @Autowired
     private EmployeeSkillService employeeSkillService;
@@ -42,7 +46,7 @@ public class EmployeeSkillController {
                 return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "创建失败"));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("创建员工技能时发生错误", e);
             return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "创建失败: " + e.getMessage()));
         }
     }
@@ -63,7 +67,7 @@ public class EmployeeSkillController {
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("查询员工技能时发生错误，ID: " + id, e);
             return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "查询失败: " + e.getMessage()));
         }
     }
@@ -79,7 +83,7 @@ public class EmployeeSkillController {
             List<EmployeeSkill> employeeSkills = employeeSkillService.lambdaQuery().eq(EmployeeSkill::getEmployeeId, currentUserId).list();
             return ResponseEntity.ok(employeeSkills);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("查询所有员工技能时发生错误", e);
             return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "查询失败: " + e.getMessage()));
         }
     }
@@ -100,7 +104,7 @@ public class EmployeeSkillController {
             List<EmployeeSkill> employeeSkills = employeeSkillService.lambdaQuery().eq(EmployeeSkill::getEmployeeId, employeeId).list();
             return ResponseEntity.ok(employeeSkills);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("根据员工ID查询员工技能时发生错误，员工ID: " + employeeId, e);
             return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "查询失败: " + e.getMessage()));
         }
     }
@@ -131,7 +135,7 @@ public class EmployeeSkillController {
                 return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "更新失败"));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("更新员工技能时发生错误，ID: " + id, e);
             return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "更新失败: " + e.getMessage()));
         }
     }
@@ -161,7 +165,7 @@ public class EmployeeSkillController {
                 return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "删除失败"));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("删除员工技能时发生错误，ID: " + id, e);
             return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "删除失败: " + e.getMessage()));
         }
     }
@@ -183,7 +187,7 @@ public class EmployeeSkillController {
             java.util.Map<String, Object> statistics = employeeSkillService.getEmployeeSkillStatistics(employeeId);
             return ResponseEntity.ok(statistics);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("获取员工技能统计时发生错误，员工ID: " + employeeId, e);
             return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "查询失败: " + e.getMessage()));
         }
     }

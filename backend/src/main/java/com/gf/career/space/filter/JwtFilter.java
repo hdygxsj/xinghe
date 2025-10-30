@@ -10,9 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class JwtFilter implements HandlerInterceptor {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -25,8 +29,8 @@ public class JwtFilter implements HandlerInterceptor {
 
         final String requestTokenHeader = request.getHeader("Authorization");
 
-        System.out.println("JWT Filter - Request URL: " + request.getRequestURL());
-        System.out.println("JWT Filter - Authorization Header: " + requestTokenHeader);
+        logger.debug("JWT Filter - Request URL: {}", request.getRequestURL());
+        logger.debug("JWT Filter - Authorization Header: {}", requestTokenHeader);
 
         String username = null;
         String jwtToken = null;
@@ -36,12 +40,12 @@ public class JwtFilter implements HandlerInterceptor {
             jwtToken = requestTokenHeader.substring(7);
             try {
                 username = jwtUtil.extractUsername(jwtToken);
-                System.out.println("JWT Filter - Extracted username: " + username);
+                logger.debug("JWT Filter - Extracted username: {}", username);
             } catch (Exception e) {
-                System.out.println("JWT Filter - Unable to extract username from token: " + e.getMessage());
+                logger.warn("JWT Filter - Unable to extract username from token: {}", e.getMessage());
             }
         } else {
-            System.out.println("JWT Filter - No valid Authorization header found");
+            logger.debug("JWT Filter - No valid Authorization header found");
         }
 
         // Once we get the token validate it.
@@ -50,16 +54,17 @@ public class JwtFilter implements HandlerInterceptor {
                 // 从数据库获取用户信息并保存到上下文中
                 Employee employee = employeeService.lambdaQuery().eq(Employee::getUsername, username).one();
                 if (employee != null) {
-                    System.out.println("JWT Filter - Loaded employee details for: " + username);
+                    logger.debug("JWT Filter - Loaded employee details for: {}", username);
                     UserContextHolder.setUser(employee);
                 } else {
-                    System.out.println("JWT Filter - Employee not found for username: " + username);
+                    logger.warn("JWT Filter - Employee not found for username: {}", username);
                 }
             } catch (Exception e) {
+                logger.error("JWT Filter - Error loading employee details", e);
                 return false;
             }
         } else {
-            System.out.println("JWT Filter - Username is null");
+            logger.debug("JWT Filter - Username is null");
         }
         return true;
     }

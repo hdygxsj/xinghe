@@ -16,12 +16,16 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/certificates")
 public class CertificateController {
+
+    private static final Logger logger = LoggerFactory.getLogger(CertificateController.class);
 
     @Autowired
     private CertificateService certificateService;
@@ -48,7 +52,7 @@ public class CertificateController {
                 return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "创建失败"));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("创建证书时发生错误", e);
             return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "创建失败: " + e.getMessage()));
         }
     }
@@ -69,7 +73,7 @@ public class CertificateController {
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("查询证书时发生错误，ID: " + id, e);
             return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "查询失败: " + e.getMessage()));
         }
     }
@@ -85,7 +89,7 @@ public class CertificateController {
             List<Certificate> certificates = certificateService.lambdaQuery().eq(Certificate::getEmployeeId, currentUserId).list();
             return ResponseEntity.ok(certificates);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("查询所有证书时发生错误", e);
             return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "查询失败: " + e.getMessage()));
         }
     }
@@ -106,7 +110,7 @@ public class CertificateController {
             List<Certificate> certificates = certificateService.lambdaQuery().eq(Certificate::getEmployeeId, employeeId).list();
             return ResponseEntity.ok(certificates);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("根据员工ID查询证书时发生错误，员工ID: " + employeeId, e);
             return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "查询失败: " + e.getMessage()));
         }
     }
@@ -137,7 +141,7 @@ public class CertificateController {
                 return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "更新失败"));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("更新证书时发生错误，ID: " + id, e);
             return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "更新失败: " + e.getMessage()));
         }
     }
@@ -167,7 +171,7 @@ public class CertificateController {
                 return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "删除失败"));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("删除证书时发生错误，ID: " + id, e);
             return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "删除失败: " + e.getMessage()));
         }
     }
@@ -198,13 +202,14 @@ public class CertificateController {
                 headers.setContentLength(pdfContent.length);
                 
                 return ResponseEntity.ok()
-                        .headers(headers)
-                        .body(pdfContent);
+                    .headers(headers)
+                    .body(pdfContent);
+            } else {
+                return ResponseEntity.notFound().build();
             }
-            return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+            logger.error("下载证书时发生错误，ID: " + id, e);
+            return ResponseEntity.badRequest().body(new byte[0]);
         }
     }
     

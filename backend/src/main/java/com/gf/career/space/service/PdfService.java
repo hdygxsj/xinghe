@@ -1,51 +1,52 @@
 package com.gf.career.space.service;
 
 import com.gf.career.space.entity.Certificate;
-import com.gf.career.space.entity.Employee;
 import com.lowagie.text.pdf.BaseFont;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import org.xhtmlrenderer.pdf.ITextFontResolver;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.xhtmlrenderer.pdf.ITextRenderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Random;
 
 @Service
 public class PdfService {
-    
-    @Autowired
-    private TemplateEngine templateEngine;
-    
-    @Autowired
-    private EmployeeService employeeService;
-    
+
+    private static final Logger logger = LoggerFactory.getLogger(PdfService.class);
+
+    private final TemplateEngine templateEngine;
+
+    public PdfService() {
+        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+        templateResolver.setTemplateMode("HTML");
+        templateResolver.setCharacterEncoding("UTF-8");
+        templateResolver.setPrefix("/templates/");
+        templateResolver.setSuffix(".html");
+        
+        templateEngine = new TemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver);
+    }
+
     public byte[] generateCertificatePdf(Certificate certificate) throws Exception {
         try {
-            // 获取员工信息
-            Employee employee = employeeService.getById(certificate.getEmployeeId());
-            String employeeName = employee != null ? employee.getName() : "未知员工";
-            
-            // 生成HTML内容
             Context context = new Context();
             context.setVariable("certificate", certificate);
-            context.setVariable("employeeName", employeeName);
             context.setVariable("verificationCode", generateVerificationCode());
             
             String htmlContent = templateEngine.process("certificate", context);
             
-            // 使用Flying Saucer转换HTML到PDF
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            
             ITextRenderer renderer = new ITextRenderer();
             
-            // 添加中文字体支持
-            ITextFontResolver fontResolver = renderer.getFontResolver();
-            boolean fontAdded = false;
+            // 配置中文字体支持
+            renderer.getFontResolver().addFont("/fonts/simsun.ttc", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
             
-            // 尝试多个字体路径
+            // 尝试加载系统字体以支持中文
+            boolean fontAdded = false;
             String[] fontPaths = {
                 // macOS系统字体
                 "/System/Library/Fonts/PingFang.ttc",
@@ -61,8 +62,8 @@ public class PdfService {
             
             for (String fontPath : fontPaths) {
                 try {
-                    fontResolver.addFont(fontPath, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                    System.out.println("成功加载字体: " + fontPath);
+                    renderer.getFontResolver().addFont(fontPath, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                    logger.debug("成功加载字体: {}", fontPath);
                     fontAdded = true;
                     break;
                 } catch (Exception e) {
@@ -71,7 +72,7 @@ public class PdfService {
             }
             
             if (!fontAdded) {
-                System.err.println("警告: 未找到中文字体，PDF中的中文可能无法正常显示");
+                logger.warn("警告: 未找到中文字体，PDF中的中文可能无法正常显示");
             }
             
             renderer.setDocumentFromString(htmlContent);
@@ -80,7 +81,7 @@ public class PdfService {
             
             return outputStream.toByteArray();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("生成PDF证书失败", e);
             throw new Exception("生成PDF证书失败: " + e.getMessage(), e);
         }
     }

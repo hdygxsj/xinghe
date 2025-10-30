@@ -8,9 +8,13 @@ import com.gf.career.space.service.UserService;
 import com.gf.career.space.util.SM3PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class UserServiceImpl extends ServiceImpl<EmployeeMapper, Employee> implements UserService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     private EmployeeMapper employeeMapper;
@@ -41,19 +45,19 @@ public class UserServiceImpl extends ServiceImpl<EmployeeMapper, Employee> imple
         queryWrapper.eq("username", username);
         Employee employee = employeeMapper.selectOne(queryWrapper);
         
-        System.out.println("Login attempt - Username: " + username);
-        System.out.println("Employee found: " + (employee != null));
+        logger.debug("Login attempt - Username: {}", username);
+        logger.debug("Employee found: {}", (employee != null));
         
         if (employee == null) {
             throw new Exception("User not found");
         }
         
-        System.out.println("Stored password hash: " + employee.getPassword());
-        System.out.println("Provided password: " + password);
+        logger.debug("Stored password hash: {}", employee.getPassword());
+        logger.debug("Provided password: {}", password);
         
         // Check password
         boolean passwordMatches = passwordEncoder.matches(password, employee.getPassword());
-        System.out.println("Password matches: " + passwordMatches);
+        logger.debug("Password matches: {}", passwordMatches);
         
         if (!passwordMatches) {
             throw new Exception("Invalid password");
