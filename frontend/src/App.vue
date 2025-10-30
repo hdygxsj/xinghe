@@ -4,7 +4,7 @@
       <el-header class="header">
         <div class="logo">GF职业空间</div>
         <div class="nav">
-          <el-menu mode="horizontal" :default-active="activeIndex" @select="handleSelect" v-if="isLoggedIn">
+          <el-menu mode="horizontal" :default-active="activeIndex" @select="handleSelect">
             <el-menu-item index="1">首页</el-menu-item>
             <el-menu-item index="2">我的历程</el-menu-item>
             <el-menu-item index="3">证书证明</el-menu-item>
@@ -13,6 +13,8 @@
             <el-menu-item index="6">职业规划</el-menu-item>
             <el-menu-item index="7">技能管理</el-menu-item>
             <el-menu-item index="8" v-if="isAdmin">角色管理</el-menu-item>
+            <el-menu-item index="9" v-if="isAdmin">HR驾驶舱</el-menu-item>
+
           </el-menu>
         </div>
         <div class="user-info" v-if="isLoggedIn">
@@ -37,16 +39,32 @@
 <script>
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
 
 export default {
   name: 'App',
   setup() {
+    const router = useRouter()
     const activeIndex = ref('1')
-    const currentUser = ref(null)
     const isLoggedIn = ref(false)
     const isAdmin = ref(false)
-    const router = useRouter()
+    const currentUser = ref(null)
+
+    // 检查登录状态
+    const checkLoginStatus = () => {
+      const user = localStorage.getItem('currentUser')
+      const token = localStorage.getItem('token')
+      
+      if (user && token) {
+        currentUser.value = JSON.parse(user)
+        isLoggedIn.value = true
+        // 检查是否为管理员
+        isAdmin.value = currentUser.value.role === 'ADMIN'
+      } else {
+        isLoggedIn.value = false
+        isAdmin.value = false
+        currentUser.value = null
+      }
+    }
 
     const handleSelect = (key) => {
       activeIndex.value = key
@@ -75,16 +93,23 @@ export default {
         case '8':
           router.push('/roles')
           break
+        case '9':
+          router.push('/hr-dashboard')
+          break
       }
     }
 
     const handleLogout = () => {
+      // 清除本地存储
       localStorage.removeItem('currentUser')
       localStorage.removeItem('token')
-      currentUser.value = null
+      
+      // 更新状态
       isLoggedIn.value = false
-      // 移除axios默认头部的Authorization
-      delete axios.defaults.headers.common['Authorization']
+      isAdmin.value = false
+      currentUser.value = null
+      
+      // 跳转到登录页
       router.push('/login')
     }
 
@@ -96,61 +121,26 @@ export default {
       router.push('/register')
     }
 
-    const checkLoginStatus = () => {
-      // Check if user is already logged in
-      const user = localStorage.getItem('currentUser')
-      const token = localStorage.getItem('token')
-      
-      if (user && token) {
-        currentUser.value = JSON.parse(user)
-        isLoggedIn.value = true
-        isAdmin.value = currentUser.value.role === 'ADMIN'
-        // 设置axios默认头部的Authorization
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-      } else {
-        currentUser.value = null
-        isLoggedIn.value = false
-        isAdmin.value = false
-      }
-    }
-
-    // 监听localStorage的变化
+    // 监听storage变化（用于处理登录状态变化）
     const handleStorageChange = (e) => {
-      if (e.key === 'currentUser' || e.key === 'token') {
+      if (e.key === 'currentUser') {
         checkLoginStatus()
       }
     }
 
     onMounted(() => {
       checkLoginStatus()
-      
-      // 监听storage事件
       window.addEventListener('storage', handleStorageChange)
-
-      // Redirect to login if not authenticated and trying to access protected routes
-      router.beforeEach((to, from, next) => {
-        const publicPages = ['/login', '/register']
-        const authRequired = !publicPages.includes(to.path)
-        const loggedIn = localStorage.getItem('currentUser') && localStorage.getItem('token')
-
-        if (authRequired && !loggedIn) {
-          return next('/login')
-        }
-
-        next()
-      })
     })
 
-    // 在组件卸载时移除事件监听器
-    // 注意：在Vue 3的Composition API中，需要使用onUnmounted生命周期钩子
-    // 但由于这里是在setup函数中，我们需要在返回之前定义它
-    // 我们将在返回的对象中添加onUnmounted钩子
+    // 清理事件监听器
+    // 注意：在Vue 3 Composition API中，这通常在组件卸载时自动处理
 
     return {
       activeIndex,
-      currentUser,
       isLoggedIn,
       isAdmin,
+      currentUser,
       handleSelect,
       handleLogout,
       goToLogin,
@@ -184,11 +174,6 @@ export default {
   display: flex;
   align-items: center;
   gap: 15px;
-}
-
-.auth-buttons {
-  display: flex;
-  gap: 10px;
 }
 
 .footer {
