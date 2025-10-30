@@ -69,6 +69,7 @@ public class UserServiceImpl extends ServiceImpl<EmployeeMapper, Employee> imple
         employeeWithoutPassword.setEmail(employee.getEmail());
         employeeWithoutPassword.setPhone(employee.getPhone());
         employeeWithoutPassword.setHireDate(employee.getHireDate());
+        employeeWithoutPassword.setRole(employee.getRole()); // Include role field
         
         return employeeWithoutPassword;
     }
