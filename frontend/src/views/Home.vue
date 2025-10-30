@@ -10,7 +10,7 @@
     
     <div class="features">
       <el-row :gutter="20">
-        <el-col :span="6">
+        <el-col :span="isAdmin ? 6 : 8">
           <div class="feature-card" @click="goToMilestones">
             <div class="feature-icon">
               <el-icon><Document /></el-icon>
@@ -19,7 +19,7 @@
             <p>记录入职培训、转正、晋升等重要时刻</p>
           </div>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="isAdmin ? 6 : 8">
           <div class="feature-card" @click="goToCertificates">
             <div class="feature-icon">
               <el-icon><Medal /></el-icon>
@@ -28,7 +28,7 @@
             <p>管理各类证明文件和荣誉证书</p>
           </div>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="isAdmin ? 6 : 8">
           <div class="feature-card" @click="goToAI">
             <div class="feature-icon">
               <el-icon><Lightning /></el-icon>
@@ -37,13 +37,14 @@
             <p>AI驱动的职业发展建议和学习路径</p>
           </div>
         </el-col>
-        <el-col :span="6">
-          <div class="feature-card" @click="goToCareerPlans">
+        <el-col :span="6" v-if="isAdmin">
+          <div class="feature-card admin-card" @click="goToRoles">
             <div class="feature-icon">
-              <el-icon><TrendCharts /></el-icon>
+              <el-icon><User /></el-icon>
             </div>
-            <h3>职业规划</h3>
-            <p>制定和跟踪您的职业发展计划</p>
+            <h3>角色管理</h3>
+            <p>管理系统角色和权限设置</p>
+            <el-tag class="admin-badge" type="danger" size="small">管理员</el-tag>
           </div>
         </el-col>
       </el-row>
@@ -57,13 +58,13 @@
             <div class="stat-label">我的里程碑</div>
           </div>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="8">
           <div class="stat-item">
             <div class="stat-number">{{ statistics.certificateCount }}</div>
             <div class="stat-label">我的证书</div>
           </div>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="8">
           <div class="stat-item">
             <div class="stat-number">{{ statistics.satisfactionRate }}%</div>
             <div class="stat-label">满意度</div>
@@ -77,7 +78,7 @@
         </el-col>
       </el-row>
     </div>
-    
+
     <!-- 数据分析图表 -->
     <div class="charts-section">
       <el-row :gutter="20">
@@ -103,7 +104,7 @@
         </el-col>
       </el-row>
     </div>
-    
+
     <!-- 最近活动 -->
     <div class="recent-activity">
       <el-card>
@@ -140,6 +141,7 @@ import { useRouter } from 'vue-router'
 import { getStatisticsByEmployeeId } from '@/api/careerInfo'
 import { getRecentActivities } from '@/api/activity'
 import { ElMessage } from 'element-plus'
+import { Document, Medal, Lightning, User } from '@element-plus/icons-vue'
 import { Document, Medal, Lightning, TrendCharts } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 
@@ -154,6 +156,7 @@ export default {
   setup() {
     const router = useRouter()
     const currentUser = ref(null)
+    const isAdmin = ref(false)
     const statistics = ref({
       milestoneCount: 0,
       certificateCount: 0,
@@ -177,9 +180,13 @@ export default {
     const goToAI = () => {
       router.push('/ai-assistant')
     }
-    
+
     const goToCareerPlans = () => {
       router.push('/career-plans')
+    }
+
+    const goToRoles = () => {
+      router.push('/roles')
     }
 
     const loadStatistics = async () => {
@@ -187,7 +194,7 @@ export default {
         if (currentUser.value && currentUser.value.id) {
           const response = await getStatisticsByEmployeeId(currentUser.value.id)
           statistics.value = { ...statistics.value, ...response.data }
-          
+
           // 加载图表数据
           await nextTick()
           loadCharts()
@@ -196,7 +203,7 @@ export default {
         ElMessage.error('加载统计数据失败')
       }
     }
-    
+
     const loadRecentActivities = async () => {
       try {
         const response = await getRecentActivities()
@@ -205,7 +212,7 @@ export default {
         ElMessage.error('加载最近活动失败')
       }
     }
-    
+
     const loadCharts = () => {
       // 里程碑类型分布图
       if (milestoneChart.value) {
@@ -246,7 +253,7 @@ export default {
         }
         milestoneChartInstance.setOption(milestoneOption)
       }
-      
+
       // 证书类型统计图
       if (certificateChart.value) {
         certificateChartInstance = echarts.init(certificateChart.value)
@@ -282,7 +289,7 @@ export default {
         certificateChartInstance.setOption(certificateOption)
       }
     }
-    
+
     const getActivityType = (type) => {
       const typeMap = {
         '里程碑': 'primary',
@@ -292,7 +299,7 @@ export default {
       }
       return typeMap[type] || 'info'
     }
-    
+
     const formatDate = (dateString) => {
       if (!dateString) return ''
       const date = new Date(dateString)
@@ -304,11 +311,12 @@ export default {
       const user = localStorage.getItem('currentUser')
       if (user) {
         currentUser.value = JSON.parse(user)
+        isAdmin.value = currentUser.value.role === 'ADMIN'
       }
       
       loadStatistics()
       loadRecentActivities()
-      
+
       // 监听窗口大小变化，重新调整图表大小
       window.addEventListener('resize', () => {
         if (milestoneChartInstance) {
@@ -322,12 +330,14 @@ export default {
 
     return {
       currentUser,
+      isAdmin,
       statistics,
       recentActivities,
       milestoneChart,
       certificateChart,
       goToMilestones,
       goToCertificates,
+      goToRoles
       goToAI,
       goToCareerPlans,
       getActivityType,
@@ -393,6 +403,17 @@ export default {
 .feature-card h3 {
   margin-bottom: 15px;
   color: #333;
+}
+
+.feature-card.admin-card {
+  border: 2px solid #ff6b35;
+  position: relative;
+}
+
+.admin-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 
 .stats {
@@ -476,27 +497,27 @@ export default {
   .hero {
     padding: 40px 15px;
   }
-  
+
   .hero h1 {
     font-size: 28px;
   }
-  
+
   .hero p {
     font-size: 16px;
   }
-  
+
   .features :deep(.el-col) {
     margin-bottom: 20px;
   }
-  
+
   .stats :deep(.el-col) {
     margin-bottom: 20px;
   }
-  
+
   .charts-section :deep(.el-col) {
     margin-bottom: 20px;
   }
-  
+
   .chart-container {
     height: 250px;
   }
