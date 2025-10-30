@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CareerInfoServiceImpl implements CareerInfoService {
@@ -76,5 +78,32 @@ public class CareerInfoServiceImpl implements CareerInfoService {
         certificate.setUpdateTime(LocalDateTime.now());
         certificateService.save(certificate);
         return certificate;
+    }
+    
+    @Override
+    public Map<String, Object> getStatistics() {
+        Map<String, Object> stats = new HashMap<>();
+        
+        // 获取总用户数（这里简化处理，实际应该有用户表）
+        // 使用正确的查询方法获取不同员工数
+        Long userCount = (long) milestoneService.lambdaQuery()
+            .select(Milestone::getEmployeeId)
+            .groupBy(Milestone::getEmployeeId)
+            .list()
+            .size();
+        stats.put("userCount", userCount);
+        
+        // 获取总里程碑数
+        Long milestoneCount = milestoneService.count();
+        stats.put("milestoneCount", milestoneCount);
+        
+        // 获取总证书数
+        Long certificateCount = certificateService.count();
+        stats.put("certificateCount", certificateCount);
+        
+        // 用户满意度（模拟数据）
+        stats.put("satisfactionRate", 95);
+        
+        return stats;
     }
 }

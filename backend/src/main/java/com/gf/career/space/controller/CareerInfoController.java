@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/career-info")
@@ -38,5 +39,10 @@ public class CareerInfoController {
     @PostMapping("/certificate/honor")
     public Certificate generateHonorCertificate(@RequestParam Long employeeId, @RequestParam Long honorId) {
         return careerInfoService.generateHonorCertificate(employeeId, honorId);
+    }
+    
+    @GetMapping("/statistics")
+    public Map<String, Object> getStatistics() {
+        return careerInfoService.getStatistics();
     }
 }

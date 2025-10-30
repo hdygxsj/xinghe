@@ -2,7 +2,9 @@ package com.gf.career.space.service;
 
 import com.gf.career.space.entity.Certificate;
 import com.gf.career.space.entity.Milestone;
+
 import java.util.List;
+import java.util.Map;
 
 public interface CareerInfoService {
     /**
@@ -41,4 +43,10 @@ public interface CareerInfoService {
      * @return 证明信息
      */
     Certificate generateHonorCertificate(Long employeeId, Long honorId);
+    
+    /**
+     * 获取系统统计信息
+     * @return 统计信息Map
+     */
+    Map<String, Object> getStatistics();
 }

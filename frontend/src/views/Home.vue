@@ -11,7 +11,7 @@
         <el-col :span="8">
           <div class="feature-card">
             <div class="feature-icon">
-              <el-icon><document /></el-icon>
+              <el-icon><Document /></el-icon>
             </div>
             <h3>历程记录</h3>
             <p>记录入职培训、转正、晋升等重要时刻</p>
@@ -20,7 +20,7 @@
         <el-col :span="8">
           <div class="feature-card">
             <div class="feature-icon">
-              <el-icon><medal /></el-icon>
+              <el-icon><Medal /></el-icon>
             </div>
             <h3>证书管理</h3>
             <p>管理各类证明文件和荣誉证书</p>
@@ -29,7 +29,7 @@
         <el-col :span="8">
           <div class="feature-card">
             <div class="feature-icon">
-              <el-icon><lightning /></el-icon>
+              <el-icon><Lightning /></el-icon>
             </div>
             <h3>智能助手</h3>
             <p>AI驱动的职业发展建议和学习路径</p>
@@ -42,25 +42,25 @@
       <el-row :gutter="20">
         <el-col :span="6">
           <div class="stat-item">
-            <div class="stat-number">128</div>
+            <div class="stat-number">{{ statistics.userCount }}</div>
             <div class="stat-label">注册用户</div>
           </div>
         </el-col>
         <el-col :span="6">
           <div class="stat-item">
-            <div class="stat-number">356</div>
+            <div class="stat-number">{{ statistics.milestoneCount }}</div>
             <div class="stat-label">里程碑事件</div>
           </div>
         </el-col>
         <el-col :span="6">
           <div class="stat-item">
-            <div class="stat-number">89</div>
+            <div class="stat-number">{{ statistics.certificateCount }}</div>
             <div class="stat-label">证书证明</div>
           </div>
         </el-col>
         <el-col :span="6">
           <div class="stat-item">
-            <div class="stat-number">95%</div>
+            <div class="stat-number">{{ statistics.satisfactionRate }}%</div>
             <div class="stat-label">用户满意度</div>
           </div>
         </el-col>
@@ -70,18 +70,47 @@
 </template>
 
 <script>
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { getStatistics } from '@/api/careerInfo'
+import { ElMessage } from 'element-plus'
+import { Document, Medal, Lightning } from '@element-plus/icons-vue'
 
 export default {
   name: 'Home',
+  components: {
+    Document,
+    Medal,
+    Lightning
+  },
   setup() {
     const router = useRouter()
+    const statistics = ref({
+      userCount: 0,
+      milestoneCount: 0,
+      certificateCount: 0,
+      satisfactionRate: 0
+    })
     
     const goToMilestones = () => {
       router.push('/milestones')
     }
     
+    const loadStatistics = async () => {
+      try {
+        const response = await getStatistics()
+        statistics.value = response.data
+      } catch (error) {
+        ElMessage.error('加载统计数据失败')
+      }
+    }
+    
+    onMounted(() => {
+      loadStatistics()
+    })
+    
     return {
+      statistics,
       goToMilestones
     }
   }
