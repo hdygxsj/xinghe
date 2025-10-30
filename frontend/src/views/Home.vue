@@ -2,8 +2,11 @@
   <div class="home">
     <!-- 英雄区域 -->
     <div class="hero">
-      <h1>欢迎来到职业空间</h1>
-      <p>记录和展示您的职业发展历程，规划未来方向</p>
+      <ParticleBackground />
+      <div class="hero-content">
+        <h1 class="animated-title">欢迎来到职业空间</h1>
+        <p class="animated-subtitle">记录和展示您的职业发展历程，规划未来方向</p>
+      </div>
     </div>
     
     <!-- 功能卡片 -->
@@ -157,6 +160,7 @@ import { getRecentActivities } from '@/api/activity'
 import { getEmployeeSkillStatistics } from '@/api/employeeSkill'
 import { ElMessage } from 'element-plus'
 import { Document, Medal, Lightning, TrendCharts } from '@element-plus/icons-vue'
+import ParticleBackground from '@/components/ParticleBackground.vue'
 import * as echarts from 'echarts'
 
 export default {
@@ -165,7 +169,8 @@ export default {
     Document,
     Medal,
     Lightning,
-    TrendCharts
+    TrendCharts,
+    ParticleBackground
   },
   setup() {
     const router = useRouter()
@@ -507,6 +512,16 @@ export default {
       return `${year}年${month}月${day}日 ${hours}:${minutes}`
     }
 
+    const getAvatarText = () => {
+      if (!currentUser.value || !currentUser.value.name) {
+        return 'U'
+      }
+      // 获取姓名的最后两个字符作为头像文字
+      return currentUser.value.name.length >= 2 
+        ? currentUser.value.name.slice(-2) 
+        : currentUser.value.name
+    }
+
     onMounted(() => {
       // Get current user from local storage
       const user = localStorage.getItem('currentUser')
@@ -544,6 +559,7 @@ export default {
       goToCareerPlans,
       getActivityType,
       formatDate,
+      getAvatarText,
       // 分页相关
       currentPage,
       pageSize,
@@ -557,25 +573,149 @@ export default {
 <style scoped>
 .home {
   padding: 20px;
+  position: relative;
+  background: linear-gradient(to bottom, #f5f7ff 0%, #ffffff 100%);
+  min-height: 100vh;
+}
+
+.user-header {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+}
+
+.user-info-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 10px 20px;
+  border-radius: 50px;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.user-info-container:hover {
+  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.25);
+  transform: translateY(-2px);
+  border-color: rgba(102, 126, 234, 0.4);
+}
+
+.user-avatar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #2d3748;
+  line-height: 1.2;
+}
+
+.user-meta {
+  font-size: 12px;
+  color: #718096;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.user-meta .department::before {
+  content: '|';
+  margin-right: 8px;
+  color: #cbd5e0;
 }
 
 .hero {
   text-align: center;
-  padding: 60px 20px;
-  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
-  border-radius: 12px;
+  padding: 80px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
   color: white;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
 }
 
-.hero h1 {
-  font-size: 36px;
-  margin-bottom: 15px;
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  animation: rotate 20s linear infinite;
 }
 
-.hero p {
-  font-size: 18px;
-  margin-bottom: 30px;
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.animated-title {
+  font-size: 42px;
+  margin-bottom: 20px;
+  font-weight: 700;
+  animation: fadeInDown 1s ease-out;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
+  letter-spacing: 1px;
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.animated-subtitle {
+  font-size: 20px;
+  margin-bottom: 0;
+  animation: fadeInUp 1s ease-out 0.3s both;
+  opacity: 0.95;
+  letter-spacing: 0.5px;
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .features {
@@ -584,63 +724,115 @@ export default {
 
 .feature-card {
   background: white;
-  border-radius: 12px;
-  padding: 20px 15px;
+  border-radius: 16px;
+  padding: 30px 20px;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   cursor: pointer;
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.feature-card:hover::before {
+  left: 100%;
 }
 
 .feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(102, 126, 234, 0.2);
+  border-color: #667eea;
 }
 
 .feature-icon {
-  font-size: 48px;
-  color: #ff6b35;
-  margin-bottom: 15px;
+  font-size: 56px;
+  color: #667eea;
+  margin-bottom: 20px;
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+  transform: scale(1.1) rotate(5deg);
 }
 
 .feature-card h3 {
-  margin-bottom: 10px;
-  color: #333;
-  font-size: 18px;
+  margin-bottom: 12px;
+  color: #2d3748;
+  font-size: 20px;
+  font-weight: 600;
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 .feature-card p {
-  color: #666;
+  color: #4a5568;
   font-size: 14px;
   margin: 0;
+  line-height: 1.6;
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 .stats {
-  background: white;
-  border-radius: 12px;
-  padding: 30px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  margin-bottom: 30px;
-  margin-top: 60px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 40px;
+  border: 1px solid rgba(102, 126, 234, 0.1);
 }
 
 .stat-item {
   text-align: center;
+  padding: 20px;
+  transition: transform 0.3s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-5px);
 }
 
 .stat-number {
-  font-size: 36px;
+  font-size: 42px;
   font-weight: bold;
-  color: #ff6b35;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: countUp 1.5s ease-out;
+}
+
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .stat-label {
   font-size: 16px;
-  color: #666;
+  color: #4a5568;
+  margin-top: 8px;
+  font-weight: 500;
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 .charts-section {
@@ -648,14 +840,34 @@ export default {
 }
 
 .chart-card {
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  overflow: hidden;
+}
+
+.chart-card:hover {
+  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.15);
+  transform: translateY(-5px);
 }
 
 .chart-header {
   font-size: 18px;
   font-weight: 600;
-  color: #333;
+  color: #2d3748;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.chart-header::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
 }
 
 .chart-container {
@@ -670,7 +882,8 @@ export default {
 .activity-header {
   font-size: 18px;
   font-weight: 600;
-  color: #333;
+  color: #2d3748;
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 .activity-card {
@@ -687,13 +900,15 @@ export default {
 
 .activity-header-info h4 {
   margin: 0;
-  color: #333;
+  color: #2d3748;
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 .employee-name {
   font-size: 14px;
-  color: #999;
+  color: #718096;
   font-weight: normal;
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 .pagination-container {
@@ -705,6 +920,15 @@ export default {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .user-header {
+    position: static;
+    margin-bottom: 15px;
+  }
+  
+  .user-info-container {
+    justify-content: center;
+  }
+  
   .hero {
     padding: 40px 15px;
   }
