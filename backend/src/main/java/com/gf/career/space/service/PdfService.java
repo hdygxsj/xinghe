@@ -42,9 +42,6 @@ public class PdfService {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ITextRenderer renderer = new ITextRenderer();
             
-            // 配置中文字体支持
-            renderer.getFontResolver().addFont("/fonts/simsun.ttc", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-            
             // 尝试加载系统字体以支持中文
             boolean fontAdded = false;
             String[] fontPaths = {
@@ -68,6 +65,7 @@ public class PdfService {
                     break;
                 } catch (Exception e) {
                     // 继续尝试下一个字体
+                    logger.debug("未找到字体: {}", fontPath);
                 }
             }
             
