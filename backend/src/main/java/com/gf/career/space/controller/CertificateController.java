@@ -3,6 +3,7 @@ package com.gf.career.space.controller;
 import com.gf.career.space.entity.Certificate;
 import com.gf.career.space.service.CertificateService;
 import com.gf.career.space.service.PdfService;
+import com.gf.career.space.util.UserContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -22,34 +23,146 @@ public class CertificateController {
     private PdfService pdfService;
 
     @PostMapping
-    public boolean createCertificate(@RequestBody Certificate certificate) {
-        return certificateService.save(certificate);
+    public ResponseEntity<?> createCertificate(@RequestBody Certificate certificate) {
+        try {
+            // 从上下文中获取当前用户ID
+            Long currentUserId = getCurrentUserId();
+            if (currentUserId == null) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "用户未登录"));
+            }
+            
+            // 设置员工ID为当前用户ID
+            certificate.setEmployeeId(currentUserId);
+            
+            boolean result = certificateService.save(certificate);
+            if (result) {
+                return ResponseEntity.ok().body(java.util.Map.of("success", true, "message", "创建成功"));
+            } else {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "创建失败"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "创建失败: " + e.getMessage()));
+        }
     }
 
     @GetMapping("/{id}")
-    public Certificate getCertificateById(@PathVariable Long id) {
-        return certificateService.getById(id);
+    public ResponseEntity<?> getCertificateById(@PathVariable Long id) {
+        try {
+            Certificate certificate = certificateService.getById(id);
+            if (certificate != null) {
+                // 检查是否是当前用户的证书
+                Long currentUserId = getCurrentUserId();
+                if (currentUserId != null && !certificate.getEmployeeId().equals(currentUserId)) {
+                    return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "无权访问该证书"));
+                }
+                
+                return ResponseEntity.ok(certificate);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "查询失败: " + e.getMessage()));
+        }
     }
 
     @GetMapping
-    public List<Certificate> getAllCertificates() {
-        return certificateService.list();
+    public ResponseEntity<?> getAllCertificates() {
+        try {
+            Long currentUserId = getCurrentUserId();
+            if (currentUserId == null) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "用户未登录"));
+            }
+            
+            List<Certificate> certificates = certificateService.lambdaQuery().eq(Certificate::getEmployeeId, currentUserId).list();
+            return ResponseEntity.ok(certificates);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "查询失败: " + e.getMessage()));
+        }
     }
 
     @GetMapping("/employee/{employeeId}")
-    public List<Certificate> getCertificatesByEmployeeId(@PathVariable Long employeeId) {
-        return certificateService.lambdaQuery().eq(Certificate::getEmployeeId, employeeId).list();
+    public ResponseEntity<?> getCertificatesByEmployeeId(@PathVariable Long employeeId) {
+        try {
+            // 检查是否是当前用户或有权限访问
+            Long currentUserId = getCurrentUserId();
+            if (currentUserId == null) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "用户未登录"));
+            }
+            
+            if (!currentUserId.equals(employeeId)) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "无权访问该员工的证书"));
+            }
+            
+            List<Certificate> certificates = certificateService.lambdaQuery().eq(Certificate::getEmployeeId, employeeId).list();
+            return ResponseEntity.ok(certificates);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "查询失败: " + e.getMessage()));
+        }
     }
 
     @PutMapping("/{id}")
-    public boolean updateCertificate(@PathVariable Long id, @RequestBody Certificate certificate) {
-        certificate.setId(id);
-        return certificateService.updateById(certificate);
+    public ResponseEntity<?> updateCertificate(@PathVariable Long id, @RequestBody Certificate certificate) {
+        try {
+            // 检查是否是当前用户的证书
+            Long currentUserId = getCurrentUserId();
+            if (currentUserId == null) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "用户未登录"));
+            }
+            
+            Certificate existingCertificate = certificateService.getById(id);
+            if (existingCertificate == null) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "证书不存在"));
+            }
+            
+            if (!existingCertificate.getEmployeeId().equals(currentUserId)) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "无权更新该证书"));
+            }
+            
+            certificate.setId(id);
+            boolean result = certificateService.updateById(certificate);
+            if (result) {
+                return ResponseEntity.ok().body(java.util.Map.of("success", true, "message", "更新成功"));
+            } else {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "更新失败"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "更新失败: " + e.getMessage()));
+        }
     }
 
     @DeleteMapping("/{id}")
-    public boolean deleteCertificate(@PathVariable Long id) {
-        return certificateService.removeById(id);
+    public ResponseEntity<?> deleteCertificate(@PathVariable Long id) {
+        try {
+            // 检查是否是当前用户的证书
+            Long currentUserId = getCurrentUserId();
+            if (currentUserId == null) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "用户未登录"));
+            }
+            
+            Certificate existingCertificate = certificateService.getById(id);
+            if (existingCertificate == null) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "证书不存在"));
+            }
+            
+            if (!existingCertificate.getEmployeeId().equals(currentUserId)) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "无权删除该证书"));
+            }
+            
+            boolean result = certificateService.removeById(id);
+            if (result) {
+                return ResponseEntity.ok().body(java.util.Map.of("success", true, "message", "删除成功"));
+            } else {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "删除失败"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "删除失败: " + e.getMessage()));
+        }
     }
     
     @GetMapping("/{id}/download")
@@ -57,6 +170,12 @@ public class CertificateController {
         try {
             Certificate certificate = certificateService.getById(id);
             if (certificate != null) {
+                // 检查是否是当前用户的证书
+                Long currentUserId = getCurrentUserId();
+                if (currentUserId != null && !certificate.getEmployeeId().equals(currentUserId)) {
+                    return ResponseEntity.badRequest().body(new byte[0]);
+                }
+                
                 // 生成PDF证书
                 byte[] pdfContent = pdfService.generateCertificatePdf(certificate);
                 
@@ -74,5 +193,14 @@ public class CertificateController {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
+    }
+    
+    /**
+     * 获取当前用户ID
+     * @return 当前用户ID，如果未登录则返回null
+     */
+    private Long getCurrentUserId() {
+        com.gf.career.space.entity.Employee currentUser = UserContextHolder.getCurrentUser();
+        return currentUser != null ? currentUser.getId() : null;
     }
 }

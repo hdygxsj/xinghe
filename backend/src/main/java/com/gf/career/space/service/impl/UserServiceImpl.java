@@ -7,7 +7,6 @@ import com.gf.career.space.mapper.EmployeeMapper;
 import com.gf.career.space.service.UserService;
 import com.gf.career.space.util.SM3PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,7 +15,7 @@ public class UserServiceImpl extends ServiceImpl<EmployeeMapper, Employee> imple
     @Autowired
     private EmployeeMapper employeeMapper;
 
-    private PasswordEncoder passwordEncoder = new SM3PasswordEncoder();
+    private SM3PasswordEncoder passwordEncoder = new SM3PasswordEncoder();
 
     @Override
     public Employee register(Employee employee) throws Exception {

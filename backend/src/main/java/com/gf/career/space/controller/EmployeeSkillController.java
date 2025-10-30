@@ -2,7 +2,9 @@ package com.gf.career.space.controller;
 
 import com.gf.career.space.entity.EmployeeSkill;
 import com.gf.career.space.service.EmployeeSkillService;
+import com.gf.career.space.util.UserContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,33 +17,154 @@ public class EmployeeSkillController {
     private EmployeeSkillService employeeSkillService;
 
     @PostMapping
-    public boolean createEmployeeSkill(@RequestBody EmployeeSkill employeeSkill) {
-        return employeeSkillService.save(employeeSkill);
+    public ResponseEntity<?> createEmployeeSkill(@RequestBody EmployeeSkill employeeSkill) {
+        try {
+            // 从上下文中获取当前用户ID
+            Long currentUserId = getCurrentUserId();
+            if (currentUserId == null) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "用户未登录"));
+            }
+            
+            // 设置员工ID为当前用户ID
+            employeeSkill.setEmployeeId(currentUserId);
+            
+            boolean result = employeeSkillService.save(employeeSkill);
+            if (result) {
+                return ResponseEntity.ok().body(java.util.Map.of("success", true, "message", "创建成功"));
+            } else {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "创建失败"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "创建失败: " + e.getMessage()));
+        }
     }
 
     @GetMapping("/{id}")
-    public EmployeeSkill getEmployeeSkillById(@PathVariable Long id) {
-        return employeeSkillService.getById(id);
+    public ResponseEntity<?> getEmployeeSkillById(@PathVariable Long id) {
+        try {
+            EmployeeSkill employeeSkill = employeeSkillService.getById(id);
+            if (employeeSkill != null) {
+                // 检查是否是当前用户的技能
+                Long currentUserId = getCurrentUserId();
+                if (currentUserId != null && !employeeSkill.getEmployeeId().equals(currentUserId)) {
+                    return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "无权访问该技能"));
+                }
+                
+                return ResponseEntity.ok(employeeSkill);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "查询失败: " + e.getMessage()));
+        }
     }
 
     @GetMapping
-    public List<EmployeeSkill> getAllEmployeeSkills() {
-        return employeeSkillService.list();
+    public ResponseEntity<?> getAllEmployeeSkills() {
+        try {
+            Long currentUserId = getCurrentUserId();
+            if (currentUserId == null) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "用户未登录"));
+            }
+            
+            List<EmployeeSkill> employeeSkills = employeeSkillService.lambdaQuery().eq(EmployeeSkill::getEmployeeId, currentUserId).list();
+            return ResponseEntity.ok(employeeSkills);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "查询失败: " + e.getMessage()));
+        }
     }
 
     @GetMapping("/employee/{employeeId}")
-    public List<EmployeeSkill> getEmployeeSkillsByEmployeeId(@PathVariable Long employeeId) {
-        return employeeSkillService.lambdaQuery().eq(EmployeeSkill::getEmployeeId, employeeId).list();
+    public ResponseEntity<?> getEmployeeSkillsByEmployeeId(@PathVariable Long employeeId) {
+        try {
+            // 检查是否是当前用户或有权限访问
+            Long currentUserId = getCurrentUserId();
+            if (currentUserId == null) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "用户未登录"));
+            }
+            
+            if (!currentUserId.equals(employeeId)) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "无权访问该员工的技能"));
+            }
+            
+            List<EmployeeSkill> employeeSkills = employeeSkillService.lambdaQuery().eq(EmployeeSkill::getEmployeeId, employeeId).list();
+            return ResponseEntity.ok(employeeSkills);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "查询失败: " + e.getMessage()));
+        }
     }
 
     @PutMapping("/{id}")
-    public boolean updateEmployeeSkill(@PathVariable Long id, @RequestBody EmployeeSkill employeeSkill) {
-        employeeSkill.setId(id);
-        return employeeSkillService.updateById(employeeSkill);
+    public ResponseEntity<?> updateEmployeeSkill(@PathVariable Long id, @RequestBody EmployeeSkill employeeSkill) {
+        try {
+            // 检查是否是当前用户的技能
+            Long currentUserId = getCurrentUserId();
+            if (currentUserId == null) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "用户未登录"));
+            }
+            
+            EmployeeSkill existingEmployeeSkill = employeeSkillService.getById(id);
+            if (existingEmployeeSkill == null) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "技能不存在"));
+            }
+            
+            if (!existingEmployeeSkill.getEmployeeId().equals(currentUserId)) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "无权更新该技能"));
+            }
+            
+            employeeSkill.setId(id);
+            boolean result = employeeSkillService.updateById(employeeSkill);
+            if (result) {
+                return ResponseEntity.ok().body(java.util.Map.of("success", true, "message", "更新成功"));
+            } else {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "更新失败"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "更新失败: " + e.getMessage()));
+        }
     }
 
     @DeleteMapping("/{id}")
-    public boolean deleteEmployeeSkill(@PathVariable Long id) {
-        return employeeSkillService.removeById(id);
+    public ResponseEntity<?> deleteEmployeeSkill(@PathVariable Long id) {
+        try {
+            // 检查是否是当前用户的技能
+            Long currentUserId = getCurrentUserId();
+            if (currentUserId == null) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "用户未登录"));
+            }
+            
+            EmployeeSkill existingEmployeeSkill = employeeSkillService.getById(id);
+            if (existingEmployeeSkill == null) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "技能不存在"));
+            }
+            
+            if (!existingEmployeeSkill.getEmployeeId().equals(currentUserId)) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "无权删除该技能"));
+            }
+            
+            boolean result = employeeSkillService.removeById(id);
+            if (result) {
+                return ResponseEntity.ok().body(java.util.Map.of("success", true, "message", "删除成功"));
+            } else {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "删除失败"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "删除失败: " + e.getMessage()));
+        }
+    }
+    
+    /**
+     * 获取当前用户ID
+     * @return 当前用户ID，如果未登录则返回null
+     */
+    private Long getCurrentUserId() {
+        com.gf.career.space.entity.Employee currentUser = UserContextHolder.getCurrentUser();
+        return currentUser != null ? currentUser.getId() : null;
     }
 }

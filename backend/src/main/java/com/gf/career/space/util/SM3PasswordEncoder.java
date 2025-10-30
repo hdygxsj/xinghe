@@ -1,18 +1,17 @@
 package com.gf.career.space.util;
 
 import org.bouncycastle.crypto.digests.SM3Digest;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.nio.charset.StandardCharsets;
 
-public class SM3PasswordEncoder implements PasswordEncoder {
+public class SM3PasswordEncoder{
 
-    @Override
+
     public String encode(CharSequence rawPassword) {
         return sm3Hash(rawPassword.toString());
     }
 
-    @Override
+
     public boolean matches(CharSequence rawPassword, String encodedPassword) {
         if (encodedPassword == null || rawPassword == null) {
             return false;

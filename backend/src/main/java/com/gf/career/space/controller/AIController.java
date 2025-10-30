@@ -6,6 +6,7 @@ import com.gf.career.space.entity.Skill;
 import com.gf.career.space.service.EmployeeService;
 import com.gf.career.space.service.MilestoneService;
 import com.gf.career.space.service.SkillService;
+import com.gf.career.space.util.UserContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,10 +33,10 @@ public class AIController {
         
         try {
             String message = (String) requestData.get("message");
-            Long employeeId = requestData.get("employeeId") != null ? 
-                Long.valueOf(requestData.get("employeeId").toString()) : null;
+            // 从上下文中获取当前用户ID
+            Long currentUserId = getCurrentUserId();
             
-            String reply = generateAIReply(message, employeeId);
+            String reply = generateAIReply(message, currentUserId);
             
             response.put("success", true);
             response.put("reply", reply);
@@ -48,11 +49,14 @@ public class AIController {
     }
 
     @GetMapping("/career-advice")
-    public Map<String, Object> getCareerAdvice(@RequestParam(required = false) Long employeeId) {
+    public Map<String, Object> getCareerAdvice() {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            String advice = generateCareerAdvice(employeeId);
+            // 从上下文中获取当前用户ID
+            Long currentUserId = getCurrentUserId();
+            
+            String advice = generateCareerAdvice(currentUserId);
             
             response.put("success", true);
             response.put("advice", advice);
@@ -65,11 +69,14 @@ public class AIController {
     }
 
     @GetMapping("/learning-path")
-    public Map<String, Object> getLearningPath(@RequestParam(required = false) Long employeeId) {
+    public Map<String, Object> getLearningPath() {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            String learningPath = generateLearningPath(employeeId);
+            // 从上下文中获取当前用户ID
+            Long currentUserId = getCurrentUserId();
+            
+            String learningPath = generateLearningPath(currentUserId);
             
             response.put("success", true);
             response.put("path", learningPath);
@@ -82,11 +89,14 @@ public class AIController {
     }
 
     @GetMapping("/resume-optimize")
-    public Map<String, Object> optimizeResume(@RequestParam(required = false) Long employeeId) {
+    public Map<String, Object> optimizeResume() {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            String optimization = generateResumeOptimization(employeeId);
+            // 从上下文中获取当前用户ID
+            Long currentUserId = getCurrentUserId();
+            
+            String optimization = generateResumeOptimization(currentUserId);
             
             response.put("success", true);
             response.put("optimization", optimization);
@@ -204,5 +214,14 @@ public class AIController {
         optimization.append("5. 定期更新简历内容");
         
         return optimization.toString();
+    }
+    
+    /**
+     * 获取当前用户ID
+     * @return 当前用户ID，如果未登录则返回null
+     */
+    private Long getCurrentUserId() {
+        com.gf.career.space.entity.Employee currentUser = UserContextHolder.getCurrentUser();
+        return currentUser != null ? currentUser.getId() : null;
     }
 }
