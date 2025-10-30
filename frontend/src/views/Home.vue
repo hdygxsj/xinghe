@@ -11,7 +11,7 @@
     <div class="features">
       <el-row :gutter="20">
         <el-col :span="8">
-          <div class="feature-card">
+          <div class="feature-card" @click="goToMilestones">
             <div class="feature-icon">
               <el-icon><Document /></el-icon>
             </div>
@@ -20,7 +20,7 @@
           </div>
         </el-col>
         <el-col :span="8">
-          <div class="feature-card">
+          <div class="feature-card" @click="goToCertificates">
             <div class="feature-icon">
               <el-icon><Medal /></el-icon>
             </div>
@@ -29,7 +29,7 @@
           </div>
         </el-col>
         <el-col :span="8">
-          <div class="feature-card">
+          <div class="feature-card" @click="goToAI">
             <div class="feature-icon">
               <el-icon><Lightning /></el-icon>
             </div>
@@ -92,6 +92,14 @@ export default {
       router.push('/milestones')
     }
 
+    const goToCertificates = () => {
+      router.push('/certificates')
+    }
+
+    const goToAI = () => {
+      router.push('/ai-assistant')
+    }
+
     const loadStatistics = async () => {
       try {
         if (currentUser.value && currentUser.value.id) {
@@ -116,7 +124,9 @@ export default {
     return {
       currentUser,
       statistics,
-      goToMilestones
+      goToMilestones,
+      goToCertificates,
+      goToAI
     }
   }
 }
@@ -157,10 +167,12 @@ export default {
   text-align: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease;
+  cursor: pointer;
 }
 
 .feature-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
 .feature-icon {
