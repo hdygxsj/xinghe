@@ -192,7 +192,7 @@
 <script>
 import { ref, computed, onMounted } from 'vue'
 import { getCertificatesByEmployeeId, downloadCertificatePdf } from '@/api/certificate'
-import { generateAnnualAssessmentCertificate, generateEmploymentContactCertificate, generateHonorCertificate } from '@/api/careerInfo'
+import { generateAnnualAssessmentCertificate, generateEmploymentContactCertificate, generateHonorCertificate as generateHonorCertificateAPI } from '@/api/careerInfo'
 import { getMilestonesByEmployeeId } from '@/api/milestone'
 import { ElMessage } from 'element-plus'
 
@@ -416,7 +416,7 @@ export default {
         generatingHonor.value = true
         
         // 调用生成API
-        const response = await generateHonorCertificate(currentUser.value.id, selectedHonor.value.id)
+        const response = await generateHonorCertificateAPI(currentUser.value.id, selectedHonor.value.id)
         
         // 检查响应是否成功
         if (response && response.data) {
