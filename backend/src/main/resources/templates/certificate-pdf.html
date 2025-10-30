@@ -9,12 +9,19 @@
             margin: 0;
         }
         
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: 'Microsoft YaHei', 'SimHei', 'Arial', sans-serif;
+            font-family: 'SimSun', 'Microsoft YaHei', 'SimHei', serif;
             background-color: #ffffff;
             margin: 0;
             padding: 0;
             color: #333;
+            line-height: 1.6;
         }
         
         .certificate-container {
@@ -23,181 +30,309 @@
             margin: 0 auto;
             background: white;
             position: relative;
-            box-sizing: border-box;
-            padding: 30mm 20mm;
+            padding: 40mm 25mm;
+            background-image: 
+                linear-gradient(0deg, transparent 24%, rgba(211, 47, 47, 0.03) 25%, rgba(211, 47, 47, 0.03) 26%, transparent 27%, transparent 74%, rgba(211, 47, 47, 0.03) 75%, rgba(211, 47, 47, 0.03) 76%, transparent 77%, transparent),
+                linear-gradient(90deg, transparent 24%, rgba(211, 47, 47, 0.03) 25%, rgba(211, 47, 47, 0.03) 26%, transparent 27%, transparent 74%, rgba(211, 47, 47, 0.03) 75%, rgba(211, 47, 47, 0.03) 76%, transparent 77%, transparent);
+            background-size: 50px 50px;
+        }
+        
+        .border-decoration {
+            position: absolute;
+            top: 15mm;
+            left: 15mm;
+            right: 15mm;
+            bottom: 15mm;
+            border: 3px double #d32f2f;
+            pointer-events: none;
+        }
+        
+        .inner-border {
+            position: absolute;
+            top: 18mm;
+            left: 18mm;
+            right: 18mm;
+            bottom: 18mm;
+            border: 1px solid #ff6b35;
+            pointer-events: none;
         }
         
         .certificate-header {
             text-align: center;
-            margin-bottom: 20mm;
+            margin-bottom: 25mm;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .org-name {
+            font-size: 20pt;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8mm;
+            letter-spacing: 2px;
         }
         
         .certificate-title {
-            font-size: 32pt;
+            font-size: 42pt;
             font-weight: bold;
             color: #d32f2f;
-            margin: 0 0 5mm 0;
+            margin: 8mm 0;
+            letter-spacing: 8px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
         
-        .certificate-subtitle {
-            font-size: 18pt;
-            color: #d32f2f;
-            margin: 0;
-        }
-        
-        .certificate-content {
-            text-align: center;
-            margin: 15mm 0;
-        }
-        
-        .certificate-label {
-            font-size: 14pt;
-            color: #666;
-        }
-        
-        .recipient-name {
-            font-size: 28pt;
-            font-weight: bold;
-            color: #d32f2f;
-            margin: 10mm 0;
-        }
-        
-        .certificate-text {
+        .certificate-type {
             font-size: 16pt;
-            line-height: 1.8;
-            margin: 15mm 0;
-            text-align: justify;
-            padding: 0 20mm;
+            color: #666;
+            margin-top: 5mm;
+            letter-spacing: 3px;
         }
         
-        .certificate-details {
-            display: table;
-            width: 100%;
+        .certificate-body {
+            position: relative;
+            z-index: 1;
             margin: 20mm 0;
         }
         
-        .detail-row {
-            display: table-row;
+        .greeting {
+            text-align: center;
+            font-size: 16pt;
+            margin-bottom: 10mm;
+            color: #333;
         }
         
-        .detail-label, .detail-value {
-            display: table-cell;
-            padding: 3mm 5mm;
-            border-bottom: 1pt solid #eee;
+        .recipient-name {
+            font-size: 32pt;
+            font-weight: bold;
+            color: #d32f2f;
+            text-align: center;
+            margin: 8mm 0;
+            letter-spacing: 4px;
         }
         
-        .detail-label {
+        .certificate-content {
+            font-size: 15pt;
+            line-height: 2.2;
+            text-align: justify;
+            text-indent: 2em;
+            margin: 15mm 10mm;
+            color: #333;
+        }
+        
+        .info-table {
+            width: 100%;
+            margin: 20mm 0;
+            border-collapse: collapse;
+        }
+        
+        .info-row {
+            height: 12mm;
+        }
+        
+        .info-label {
+            width: 35%;
             font-size: 14pt;
             color: #666;
-            width: 30%;
+            padding: 3mm 5mm;
+            text-align: right;
+            padding-right: 10mm;
         }
         
-        .detail-value {
+        .info-value {
             font-size: 14pt;
-            font-weight: bold;
+            font-weight: normal;
+            padding: 3mm 5mm;
+            border-bottom: 1px solid #eee;
         }
         
         .certificate-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-top: 25mm;
+            position: relative;
+            margin-top: 30mm;
+            z-index: 1;
         }
         
-        .issuer-info {
-            font-size: 14pt;
+        .footer-content {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .footer-left, .footer-right {
+            vertical-align: bottom;
+            padding: 10px;
+        }
+        
+        .footer-left {
+            width: 50%;
+            text-align: left;
+        }
+        
+        .footer-right {
+            width: 50%;
+            text-align: right;
         }
         
         .issuer-name {
+            font-size: 15pt;
             font-weight: bold;
-            margin-bottom: 2mm;
+            margin-bottom: 5mm;
+            color: #333;
         }
         
         .issue-date {
+            font-size: 14pt;
             color: #666;
         }
         
         .certificate-seal {
-            width: 80pt;
-            height: 80pt;
-            border: 2pt solid #d32f2f;
+            display: inline-block;
+            width: 100px;
+            height: 100px;
+            border: 3px solid #d32f2f;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12pt;
+            position: relative;
+            background: radial-gradient(circle, rgba(211, 47, 47, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
+        }
+        
+        .seal-star {
+            position: absolute;
+            top: 42px;
+            left: 42px;
+            width: 15px;
+            height: 15px;
+        }
+        
+        .seal-star::before {
+            content: '★';
+            font-size: 15px;
+            color: #d32f2f;
+        }
+        
+        .seal-text-top {
+            position: absolute;
+            top: 18px;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            font-size: 11px;
             font-weight: bold;
             color: #d32f2f;
             text-align: center;
-            padding: 5pt;
+            width: 100%;
+            letter-spacing: 1px;
         }
         
-        .certificate-id {
+        .seal-text-middle {
+            position: absolute;
+            top: 45px;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            font-size: 10px;
+            font-weight: bold;
+            color: #d32f2f;
             text-align: center;
-            font-size: 12pt;
+            width: 80%;
+            line-height: 1.3;
+        }
+        
+        .seal-text-bottom {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            font-size: 11px;
+            font-weight: bold;
+            color: #d32f2f;
+            text-align: center;
+            width: 100%;
+            letter-spacing: 1px;
+        }
+        
+        .verification-section {
+            text-align: center;
+            font-size: 11pt;
             color: #999;
-            margin-top: 15mm;
-            padding-top: 5mm;
-            border-top: 1pt dashed #ccc;
+            margin-top: 20mm;
+            padding-top: 8mm;
+            border-top: 1px dashed #ccc;
+        }
+        
+        .verification-code {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #666;
         }
         
         .watermark {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-30deg);
-            font-size: 80pt;
+            top: 400px;
+            left: 200px;
+            font-size: 72pt;
             font-weight: bold;
-            color: rgba(211, 47, 47, 0.05);
+            color: rgba(211, 47, 47, 0.03);
             pointer-events: none;
             z-index: 0;
+            letter-spacing: 10px;
+            transform: rotate(-45deg);
         }
     </style>
 </head>
 <body>
     <div class="certificate-container">
+        <div class="border-decoration"></div>
+        <div class="inner-border"></div>
         <div class="watermark">GF职业空间</div>
         
         <div class="certificate-header">
-            <div class="certificate-title" th:text="${certificate.title}">证书标题</div>
-            <div class="certificate-subtitle" th:text="${certificate.certificateType}">证书类型</div>
+            <div class="org-name">广发银行研发中心</div>
+            <div class="certificate-title" th:text="${certificate.certificateType}">证明</div>
+            <div class="certificate-type" th:text="${certificate.title}">职业发展证明</div>
         </div>
         
-        <div class="certificate-content">
-            <div class="certificate-label">兹证明</div>
+        <div class="certificate-body">
+            <div class="greeting">兹证明</div>
             <div class="recipient-name" th:text="${employeeName}">员工姓名</div>
-        </div>
-        
-        <div class="certificate-text" th:text="${certificate.description}">证书描述内容</div>
-        
-        <div class="certificate-details">
-            <div class="detail-row">
-                <div class="detail-label">证书编号:</div>
-                <div class="detail-value" th:text="${certificate.id}">001</div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">颁发日期:</div>
-                <div class="detail-value" th:text="${#temporals.format(certificate.issueDate, 'yyyy年MM月dd日')}">2023年01月01日</div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">证书类型:</div>
-                <div class="detail-value" th:text="${certificate.certificateType}">证书类型</div>
-            </div>
+            
+            <div class="certificate-content" th:utext="${certificate.description}">该员工在本单位工作期间表现优秀，特此证明。</div>
+            
+            <table class="info-table">
+                <tr class="info-row">
+                    <td class="info-label">证书编号：</td>
+                    <td class="info-value" th:text="${certificate.id}">20220115</td>
+                </tr>
+                <tr class="info-row">
+                    <td class="info-label">颁发日期：</td>
+                    <td class="info-value" th:text="${certificate.issueDate != null ? #temporals.format(certificate.issueDate, 'yyyy年MM月dd日') : ''}">2022年01月15日</td>
+                </tr>
+                <tr class="info-row">
+                    <td class="info-label">证书类型：</td>
+                    <td class="info-value" th:text="${certificate.certificateType}">年度考核证明</td>
+                </tr>
+            </table>
         </div>
         
         <div class="certificate-footer">
-            <div class="issuer-info">
-                <div class="issuer-name" th:text="${certificate.issuer}">颁发机构</div>
-                <div class="issue-date">颁发日期: <span th:text="${#temporals.format(certificate.issueDate, 'yyyy年MM月dd日')}">2023年01月01日</span></div>
-            </div>
-            <div class="certificate-seal">
-                GF职业空间<br>认证 seal
-            </div>
+            <table class="footer-content">
+                <tr>
+                    <td class="footer-left">
+                        <div class="issuer-name" th:text="${certificate.issuer}">人力资源部</div>
+                        <div class="issue-date">颁发日期：<span th:text="${certificate.issueDate != null ? #temporals.format(certificate.issueDate, 'yyyy年MM月dd日') : ''}">2022年01月15日</span></div>
+                    </td>
+                    <td class="footer-right">
+                        <div class="certificate-seal">
+                            <div class="seal-star"></div>
+                            <div class="seal-text-top">广发银行</div>
+                            <div class="seal-text-middle">研发中心<br/>黑客马拉松</div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
         </div>
         
-        <div class="certificate-id">
-            证书ID: <span th:text="${certificate.id}">001</span> | 
-            验证码: <span th:text="${verificationCode}">ABC123</span>
+        <div class="verification-section">
+            证书编号：<span class="verification-code" th:text="${certificate.id}">1</span> |
+            验证码：<span class="verification-code" th:text="${verificationCode}">L5JKWA</span>
         </div>
     </div>
 </body>

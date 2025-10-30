@@ -2,11 +2,14 @@ package com.gf.career.space.service;
 
 import com.gf.career.space.entity.Certificate;
 import com.gf.career.space.entity.Employee;
-import com.itextpdf.html2pdf.HtmlConverter;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.pdf.BaseFont;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import org.xhtmlrenderer.pdf.ITextFontResolver;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Random;
@@ -26,19 +29,55 @@ public class PdfService {
             Employee employee = employeeService.getById(certificate.getEmployeeId());
             String employeeName = employee != null ? employee.getName() : "未知员工";
             
-            // 生成HTML内容，使用专门的PDF模板
+            // 生成HTML内容
             Context context = new Context();
             context.setVariable("certificate", certificate);
             context.setVariable("employeeName", employeeName);
             context.setVariable("verificationCode", generateVerificationCode());
             
-            String htmlContent = templateEngine.process("certificate-pdf", context);
+            String htmlContent = templateEngine.process("certificate", context);
             
-            // 将HTML转换为PDF
+            // 使用Flying Saucer转换HTML到PDF
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             
-            // 使用HtmlConverter转换HTML到PDF
-            HtmlConverter.convertToPdf(htmlContent, outputStream);
+            ITextRenderer renderer = new ITextRenderer();
+            
+            // 添加中文字体支持
+            ITextFontResolver fontResolver = renderer.getFontResolver();
+            boolean fontAdded = false;
+            
+            // 尝试多个字体路径
+            String[] fontPaths = {
+                // macOS系统字体
+                "/System/Library/Fonts/PingFang.ttc",
+                "/System/Library/Fonts/Supplemental/Songti.ttc",
+                "/Library/Fonts/Songti.ttc",
+                // Windows系统字体
+                "C:/Windows/Fonts/simsun.ttc",
+                "C:/Windows/Fonts/msyh.ttc",
+                // Linux系统字体
+                "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc",
+                "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
+            };
+            
+            for (String fontPath : fontPaths) {
+                try {
+                    fontResolver.addFont(fontPath, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                    System.out.println("成功加载字体: " + fontPath);
+                    fontAdded = true;
+                    break;
+                } catch (Exception e) {
+                    // 继续尝试下一个字体
+                }
+            }
+            
+            if (!fontAdded) {
+                System.err.println("警告: 未找到中文字体，PDF中的中文可能无法正常显示");
+            }
+            
+            renderer.setDocumentFromString(htmlContent);
+            renderer.layout();
+            renderer.createPDF(outputStream);
             
             return outputStream.toByteArray();
         } catch (Exception e) {
