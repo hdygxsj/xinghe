@@ -159,6 +159,28 @@ public class EmployeeSkillController {
         }
     }
     
+    @GetMapping("/statistics/{employeeId}")
+    public ResponseEntity<?> getEmployeeSkillStatistics(@PathVariable Long employeeId) {
+        try {
+            // 检查是否是当前用户或有权限访问
+            Long currentUserId = getCurrentUserId();
+            if (currentUserId == null) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "用户未登录"));
+            }
+            
+            if (!currentUserId.equals(employeeId)) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "无权访问该员工的技能统计"));
+            }
+            
+            // 获取员工技能统计信息
+            java.util.Map<String, Object> statistics = employeeSkillService.getEmployeeSkillStatistics(employeeId);
+            return ResponseEntity.ok(statistics);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "查询失败: " + e.getMessage()));
+        }
+    }
+    
     /**
      * 获取当前用户ID
      * @return 当前用户ID，如果未登录则返回null

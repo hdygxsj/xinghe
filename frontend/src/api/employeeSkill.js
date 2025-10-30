@@ -31,3 +31,8 @@ export const updateEmployeeSkill = (id, employeeSkillData) => {
 export const deleteEmployeeSkill = (id) => {
   return apiClient.delete(`${BASE_URL}/${id}`)
 }
+
+// 获取员工技能统计（按技能类型分组）
+export const getEmployeeSkillStatistics = (employeeId) => {
+  return apiClient.get(`${BASE_URL}/statistics/${employeeId}`)
+}

@@ -86,6 +86,20 @@ CREATE TABLE IF NOT EXISTS skill (
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- 插入三种技能类型示例数据
+INSERT INTO skill (name, category, description, level) VALUES
+('Java编程', '技术技能', 'Java编程语言的掌握程度', 3),
+('项目管理', '软技能', '项目规划、执行和监控的能力', 4),
+('数据分析', '技术技能', '使用统计方法和工具分析数据的能力', 2),
+('沟通能力', '软技能', '有效沟通和表达的能力', 5),
+('团队协作', '软技能', '在团队中有效合作的能力', 4),
+('英语能力', '语言技能', '英语听说读写能力', 3),
+('产品设计', '技术技能', '产品设计和用户体验设计能力', 3),
+('领导力', '软技能', '带领团队和影响他人的能力', 3),
+('财务分析', '专业技能', '财务报表分析和财务规划能力', 2),
+('市场营销', '专业技能', '市场调研和营销策略制定能力', 3)
+ON DUPLICATE KEY UPDATE name=name;
+
 -- 员工技能表
 CREATE TABLE IF NOT EXISTS employee_skill (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,

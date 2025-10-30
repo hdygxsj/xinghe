@@ -9,42 +9,42 @@
     <!-- 功能卡片 -->
     <div class="features">
       <el-row :gutter="20">
-      <el-col :span="6">
-        <div class="feature-card" @click="goToMilestones">
-          <div class="feature-icon">
-            <el-icon><Document /></el-icon>
+        <el-col :span="6">
+          <div class="feature-card" @click="goToMilestones">
+            <div class="feature-icon">
+              <el-icon><Document /></el-icon>
+            </div>
+            <h3>历程记录</h3>
+            <p>记录入职培训、转正、晋升等重要时刻</p>
           </div>
-          <h3>历程记录</h3>
-          <p>记录入职培训、转正、晋升等重要时刻</p>
-        </div>
-      </el-col>
-      <el-col :span="6">
-        <div class="feature-card" @click="goToCertificates">
-          <div class="feature-icon">
-            <el-icon><Medal /></el-icon>
+        </el-col>
+        <el-col :span="6">
+          <div class="feature-card" @click="goToCertificates">
+            <div class="feature-icon">
+              <el-icon><Medal /></el-icon>
+            </div>
+            <h3>证书管理</h3>
+            <p>管理各类证明文件和荣誉证书</p>
           </div>
-          <h3>证书管理</h3>
-          <p>管理各类证明文件和荣誉证书</p>
-        </div>
-      </el-col>
-      <el-col :span="6">
-        <div class="feature-card" @click="goToAI">
-          <div class="feature-icon">
-            <el-icon><Lightning /></el-icon>
+        </el-col>
+        <el-col :span="6">
+          <div class="feature-card" @click="goToAI">
+            <div class="feature-icon">
+              <el-icon><Lightning /></el-icon>
+            </div>
+            <h3>智能助手</h3>
+            <p>AI驱动的职业发展建议和学习路径</p>
           </div>
-          <h3>智能助手</h3>
-          <p>AI驱动的职业发展建议和学习路径</p>
-        </div>
-      </el-col>
-      <el-col :span="6">
-        <div class="feature-card" @click="goToCareerPlans">
-          <div class="feature-icon">
-            <el-icon><TrendCharts /></el-icon>
+        </el-col>
+        <el-col :span="6">
+          <div class="feature-card" @click="goToCareerPlans">
+            <div class="feature-icon">
+              <el-icon><TrendCharts /></el-icon>
+            </div>
+            <h3>职业规划</h3>
+            <p>制定和跟踪您的职业发展计划</p>
           </div>
-          <h3>职业规划</h3>
-          <p>制定和跟踪您的职业发展计划</p>
-        </div>
-      </el-col>
+        </el-col>
       </el-row>
     </div>
     
@@ -81,7 +81,7 @@
     <!-- 图表区域 -->
     <div class="charts-section">
       <el-row :gutter="20">
-        <el-col :span="12" :xs="24">
+        <el-col :span="8" :xs="24">
           <el-card class="chart-card">
             <template #header>
               <div class="chart-header">里程碑类型分布</div>
@@ -89,12 +89,20 @@
             <div ref="milestoneChart" class="chart-container"></div>
           </el-card>
         </el-col>
-        <el-col :span="12" :xs="24">
+        <el-col :span="8" :xs="24">
           <el-card class="chart-card">
             <template #header>
               <div class="chart-header">证书类型统计</div>
             </template>
             <div ref="certificateChart" class="chart-container"></div>
+          </el-card>
+        </el-col>
+        <el-col :span="8" :xs="24">
+          <el-card class="chart-card">
+            <template #header>
+              <div class="chart-header">技能雷达图</div>
+            </template>
+            <div ref="skillChart" class="chart-container"></div>
           </el-card>
         </el-col>
       </el-row>
@@ -146,6 +154,7 @@ import { ref, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { getStatisticsByEmployeeId } from '@/api/careerInfo'
 import { getRecentActivities } from '@/api/activity'
+import { getEmployeeSkillStatistics } from '@/api/employeeSkill'
 import { ElMessage } from 'element-plus'
 import { Document, Medal, Lightning, TrendCharts } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
@@ -170,8 +179,10 @@ export default {
     const recentActivities = ref([])
     const milestoneChart = ref(null)
     const certificateChart = ref(null)
+    const skillChart = ref(null)
     let milestoneChartInstance = null
     let certificateChartInstance = null
+    let skillChartInstance = null
     
     // 分页相关
     const currentPage = ref(1)
@@ -224,7 +235,7 @@ export default {
       loadRecentActivities(page)
     }
     
-    const loadCharts = () => {
+    const loadCharts = async () => {
       // 里程碑类型分布图
       if (milestoneChart.value) {
         milestoneChartInstance = echarts.init(milestoneChart.value)
@@ -299,6 +310,81 @@ export default {
         }
         certificateChartInstance.setOption(certificateOption)
       }
+      
+      // 技能雷达图
+      if (skillChart.value && currentUser.value && currentUser.value.id) {
+        try {
+          // 获取员工技能统计
+          const skillStatsResponse = await getEmployeeSkillStatistics(currentUser.value.id)
+          const skillStats = skillStatsResponse.data
+          
+          skillChartInstance = echarts.init(skillChart.value)
+          const skillOption = {
+            title: {
+              text: '技能分布',
+              left: 'center'
+            },
+            tooltip: {},
+            radar: {
+              indicator: [
+                { name: '技术技能', max: 10 },
+                { name: '软技能', max: 10 },
+                { name: '专业技能', max: 10 },
+                { name: '语言技能', max: 10 },
+                { name: '管理技能', max: 10 }
+              ]
+            },
+            series: [{
+              type: 'radar',
+              data: [{
+                value: [
+                  skillStats.skillTypeCount['技术技能'] || 0,
+                  skillStats.skillTypeCount['软技能'] || 0,
+                  skillStats.skillTypeCount['专业技能'] || 0,
+                  skillStats.skillTypeCount['语言技能'] || 0,
+                  skillStats.skillTypeCount['管理技能'] || 0
+                ],
+                name: '技能评分'
+              }]
+            }]
+          }
+          skillChartInstance.setOption(skillOption)
+        } catch (error) {
+          console.error('加载技能统计失败:', error)
+          // 使用默认数据
+          skillChartInstance = echarts.init(skillChart.value)
+          const skillOption = {
+            title: {
+              text: '技能分布',
+              left: 'center'
+            },
+            tooltip: {},
+            radar: {
+              indicator: [
+                { name: '技术技能', max: 10 },
+                { name: '软技能', max: 10 },
+                { name: '专业技能', max: 10 },
+                { name: '语言技能', max: 10 },
+                { name: '管理技能', max: 10 }
+              ]
+            },
+            series: [{
+              type: 'radar',
+              data: [{
+                value: [
+                  Math.min(statistics.value.skillCount * 0.3, 10),
+                  Math.min(statistics.value.skillCount * 0.25, 10),
+                  Math.min(statistics.value.skillCount * 0.2, 10),
+                  Math.min(statistics.value.skillCount * 0.15, 10),
+                  Math.min(statistics.value.skillCount * 0.1, 10)
+                ],
+                name: '技能评分'
+              }]
+            }]
+          }
+          skillChartInstance.setOption(skillOption)
+        }
+      }
     }
     
     const getActivityType = (type) => {
@@ -359,6 +445,9 @@ export default {
         if (certificateChartInstance) {
           certificateChartInstance.resize()
         }
+        if (skillChartInstance) {
+          skillChartInstance.resize()
+        }
       })
     })
 
@@ -368,6 +457,7 @@ export default {
       recentActivities,
       milestoneChart,
       certificateChart,
+      skillChart,
       goToMilestones,
       goToCertificates,
       goToAI,
@@ -415,7 +505,7 @@ export default {
 .feature-card {
   background: white;
   border-radius: 12px;
-  padding: 30px 20px;
+  padding: 20px 15px;
   text-align: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease;
