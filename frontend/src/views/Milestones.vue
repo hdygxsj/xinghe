@@ -23,16 +23,26 @@
           :timestamp="formatDate(milestone.eventDate)"
           placement="top"
         >
-          <el-card>
+          <el-card class="milestone-card" shadow="hover">
             <template #header>
-              <h4>{{ milestone.title }}</h4>
+              <div class="milestone-header">
+                <h3 class="milestone-title">{{ milestone.title }}</h3>
+                <el-tag class="milestone-type-tag" :type="getMilestoneTypeTag(milestone.type)">
+                  {{ milestone.type }}
+                </el-tag>
+              </div>
             </template>
-            <p>{{ milestone.description }}</p>
-            <div class="milestone-footer">
-              <span class="milestone-type">{{ milestone.type }}</span>
-              <div class="actions">
-                <el-button size="small" @click="editMilestone(milestone)">编辑</el-button>
-                <el-button size="small" type="danger" @click="handleDeleteMilestone(milestone.id)">删除</el-button>
+            <div class="milestone-content">
+              <p class="milestone-description">{{ milestone.description }}</p>
+              <div class="milestone-footer">
+                <div class="milestone-date">
+                  <el-icon><Calendar /></el-icon>
+                  <span>{{ formatDate(milestone.eventDate) }}</span>
+                </div>
+                <div class="actions">
+                  <el-button size="small" @click="editMilestone(milestone)">编辑</el-button>
+                  <el-button size="small" type="danger" @click="handleDeleteMilestone(milestone.id)">删除</el-button>
+                </div>
               </div>
             </div>
           </el-card>
@@ -85,11 +95,15 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue'
-import { getMilestoneById, getMilestonesByEmployeeId, createMilestone, updateMilestone, deleteMilestone } from '@/api/milestone'
+import { getAllMilestones, getMilestonesByEmployeeId, createMilestone, updateMilestone, deleteMilestone } from '@/api/milestone'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Calendar } from '@element-plus/icons-vue'
 
 export default {
   name: 'Milestones',
+  components: {
+    Calendar
+  },
   setup() {
     const activeTab = ref('all')
     const milestones = ref([])
@@ -115,6 +129,18 @@ export default {
     
     const handleTabChange = (tab) => {
       activeTab.value = tab
+    }
+    
+    const getMilestoneTypeTag = (type) => {
+      const typeMap = {
+        '入职培训': 'primary',
+        '转正': 'success',
+        '部门调整': 'warning',
+        '职位晋升': 'danger',
+        '参赛荣誉': 'info',
+        '重大项目': ''
+      }
+      return typeMap[type] || 'info'
     }
     
     const showAddDialog = () => {
@@ -255,7 +281,8 @@ export default {
       saveMilestone,
       handleDeleteMilestone,
       formatDate,
-      loadMilestones
+      loadMilestones,
+      getMilestoneTypeTag
     }
   }
 }
@@ -273,27 +300,149 @@ export default {
   margin-bottom: 20px;
 }
 
+.header-section h2 {
+  color: #333;
+  font-size: 28px;
+  font-weight: 600;
+}
+
 .timeline {
   margin-top: 20px;
+}
+
+.milestone-card {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.milestone-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.milestone-card :deep(.el-card__header) {
+  padding: 20px 20px 10px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.milestone-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.milestone-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+}
+
+.milestone-type-tag {
+  height: 24px;
+  line-height: 22px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.milestone-card :deep(.el-card__body) {
+  padding: 20px;
+}
+
+.milestone-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.milestone-description {
+  margin: 0;
+  color: #666;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 .milestone-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 15px;
+  margin-top: 10px;
+  padding-top: 15px;
+  border-top: 1px dashed #eee;
 }
 
-.milestone-type {
-  background-color: #ff6b35;
-  color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+.milestone-date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #999;
+  font-size: 14px;
+}
+
+.milestone-date .el-icon {
+  font-size: 16px;
 }
 
 .actions {
   display: flex;
   gap: 10px;
+}
+
+.actions .el-button {
+  border-radius: 6px;
+  font-size: 13px;
+  padding: 8px 12px;
+}
+
+/* 时间轴样式优化 */
+:deep(.el-timeline-item__wrapper) {
+  padding-bottom: 30px;
+}
+
+:deep(.el-timeline-item__tail) {
+  left: 3px;
+  border-left: 2px solid #e4e7ed;
+}
+
+:deep(.el-timeline-item__node) {
+  width: 8px;
+  height: 8px;
+  left: 0;
+  background-color: #ff6b35;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .milestones {
+    padding: 15px;
+  }
+  
+  .header-section {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+  
+  .milestone-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .milestone-footer {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  
+  .actions {
+    align-self: flex-end;
+  }
 }
 </style>
