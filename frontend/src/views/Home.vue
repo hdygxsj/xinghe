@@ -116,7 +116,7 @@
       <el-card>
         <template #header>
           <div class="activity-header">
-            <span>公司最近活动</span>
+            <span>最近活动</span>
           </div>
         </template>
         <el-timeline>
@@ -128,11 +128,13 @@
           >
             <el-card class="activity-card">
               <div class="activity-header-info">
-                <h4>{{ activity.title }}</h4>
-                <span v-if="activity.employeeName" class="employee-name">{{ activity.employeeName }}</span>
+                <div class="activity-title-section">
+                  <span v-if="activity.employeeName" class="employee-name">{{ activity.employeeName }}</span>
+                  <h4>{{ activity.title }}</h4>
+                </div>
+                <el-tag :type="getActivityType(activity.type)" class="activity-type-tag">{{ activity.type }}</el-tag>
               </div>
               <p>{{ activity.description }}</p>
-              <el-tag :type="getActivityType(activity.type)">{{ activity.type }}</el-tag>
             </el-card>
           </el-timeline-item>
         </el-timeline>
@@ -899,37 +901,32 @@ export default {
   margin-bottom: 10px;
 }
 
-.activity-header-info h4 {
+.activity-title-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.activity-title-section h4 {
   margin: 0;
-  color: #2d3748;
-  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: #333;
 }
 
 .employee-name {
   font-size: 14px;
-  color: #718096;
-  font-weight: normal;
-  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: #ff6b35;
+  font-weight: bold;
+  background-color: #fff2ed;
+  padding: 2px 8px;
+  border-radius: 12px;
 }
 
-.pagination-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-  padding: 20px 0;
+.activity-type-tag {
+  flex-shrink: 0;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .user-header {
-    position: static;
-    margin-bottom: 15px;
-  }
-  
-  .user-info-container {
-    justify-content: center;
-  }
-  
   .hero {
     padding: 40px 15px;
   }
@@ -956,6 +953,18 @@ export default {
   
   .chart-container {
     height: 250px;
+  }
+  
+  .activity-header-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .activity-title-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
   }
 }
 </style>
