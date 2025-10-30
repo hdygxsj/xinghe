@@ -2,16 +2,19 @@ package com.gf.career.space.service.impl;
 
 import com.gf.career.space.entity.Certificate;
 import com.gf.career.space.entity.Milestone;
+import com.gf.career.space.entity.Employee;
+import com.gf.career.space.entity.EmployeeSkill;
 import com.gf.career.space.service.CareerInfoService;
 import com.gf.career.space.service.CertificateService;
 import com.gf.career.space.service.MilestoneService;
+import com.gf.career.space.service.EmployeeService;
+import com.gf.career.space.service.EmployeeSkillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CareerInfoServiceImpl implements CareerInfoService {
@@ -21,6 +24,12 @@ public class CareerInfoServiceImpl implements CareerInfoService {
 
     @Autowired
     private CertificateService certificateService;
+    
+    @Autowired
+    private EmployeeService employeeService;
+    
+    @Autowired
+    private EmployeeSkillService employeeSkillService;
 
     @Override
     public List<Milestone> getMilestonesByEmployeeId(Long employeeId) {
@@ -101,6 +110,10 @@ public class CareerInfoServiceImpl implements CareerInfoService {
         Long certificateCount = certificateService.count();
         stats.put("certificateCount", certificateCount);
         
+        // 获取总技能数
+        Long skillCount = employeeSkillService.count();
+        stats.put("skillCount", skillCount);
+        
         // 用户满意度（模拟数据）
         stats.put("satisfactionRate", 95);
         
@@ -123,9 +136,81 @@ public class CareerInfoServiceImpl implements CareerInfoService {
             .count();
         stats.put("certificateCount", certificateCount);
         
+        // 获取指定员工的技能数
+        Long skillCount = employeeSkillService.lambdaQuery()
+            .eq(EmployeeSkill::getEmployeeId, employeeId)
+            .count();
+        stats.put("skillCount", skillCount);
+        
         // 用户满意度（模拟数据）
         stats.put("satisfactionRate", 95);
         
         return stats;
+    }
+    
+    @Override
+    public List<Map<String, Object>> getRecentActivities() {
+        // 获取最近的里程碑活动（最多20条）
+        List<Milestone> recentMilestones = milestoneService.lambdaQuery()
+            .orderByDesc(Milestone::getCreateTime)
+            .last("LIMIT 20")
+            .list();
+            
+        // 获取最近的证书活动（最多20条）
+        List<Certificate> recentCertificates = certificateService.lambdaQuery()
+            .orderByDesc(Certificate::getCreateTime)
+            .last("LIMIT 20")
+            .list();
+            
+        // 合并并排序所有活动
+        List<Map<String, Object>> allActivities = new ArrayList<>();
+        
+        // 处理里程碑活动
+        for (Milestone milestone : recentMilestones) {
+            Map<String, Object> activity = new HashMap<>();
+            activity.put("id", milestone.getId());
+            activity.put("title", milestone.getTitle());
+            activity.put("description", milestone.getDescription());
+            activity.put("type", "里程碑");
+            activity.put("createTime", milestone.getCreateTime());
+            
+            // 获取员工信息
+            Employee employee = employeeService.getById(milestone.getEmployeeId());
+            if (employee != null) {
+                activity.put("employeeName", employee.getName());
+                activity.put("employeeId", employee.getId());
+            }
+            
+            allActivities.add(activity);
+        }
+        
+        // 处理证书活动
+        for (Certificate certificate : recentCertificates) {
+            Map<String, Object> activity = new HashMap<>();
+            activity.put("id", certificate.getId());
+            activity.put("title", certificate.getTitle());
+            activity.put("description", certificate.getDescription());
+            activity.put("type", "证书");
+            activity.put("createTime", certificate.getCreateTime());
+            
+            // 获取员工信息
+            Employee employee = employeeService.getById(certificate.getEmployeeId());
+            if (employee != null) {
+                activity.put("employeeName", employee.getName());
+                activity.put("employeeId", employee.getId());
+            }
+            
+            allActivities.add(activity);
+        }
+        
+        // 按创建时间排序，取最新的10条记录
+        return allActivities.stream()
+            .sorted((a, b) -> {
+                LocalDateTime timeA = (LocalDateTime) a.get("createTime");
+                LocalDateTime timeB = (LocalDateTime) b.get("createTime");
+                return timeB.compareTo(timeA); // 降序排列
+            })
+            .limit(10)
+            .collect(Collectors.toList());
     }
 }

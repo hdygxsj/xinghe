@@ -2,7 +2,9 @@ package com.gf.career.space.controller;
 
 import com.gf.career.space.entity.Certificate;
 import com.gf.career.space.entity.Milestone;
+import com.gf.career.space.entity.Employee;
 import com.gf.career.space.service.CareerInfoService;
+import com.gf.career.space.service.EmployeeService;
 import com.gf.career.space.util.UserContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,9 @@ public class CareerInfoController {
 
     @Autowired
     private CareerInfoService careerInfoService;
+    
+    @Autowired
+    private EmployeeService employeeService;
 
     @GetMapping("/milestones/{employeeId}")
     public List<Milestone> getMilestonesByEmployeeId(@PathVariable Long employeeId) {
@@ -86,6 +91,12 @@ public class CareerInfoController {
         }
         
         return careerInfoService.getStatisticsByEmployeeId(employeeId);
+    }
+    
+    @GetMapping("/recent-activities")
+    public List<Map<String, Object>> getRecentActivities() {
+        // 获取最近的里程碑和证书活动
+        return careerInfoService.getRecentActivities();
     }
     
     /**
