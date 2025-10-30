@@ -80,21 +80,6 @@ import { Document, Medal, Lightning } from '@element-plus/icons-vue'
 
 export default {
   name: 'Home',
-  data() {
-    return {
-      currentUser: null
-    }
-  },
-  created() {
-    // Get current user from local storage
-    const user = localStorage.getItem('currentUser')
-    if (user) {
-      this.currentUser = JSON.parse(user)
-    }
-  },
-  methods: {
-    goToMilestones() {
-      this.$router.push('/milestones')
   components: {
     Document,
     Medal,
@@ -102,11 +87,12 @@ export default {
   },
   setup() {
     const router = useRouter()
+    const currentUser = ref(null)
     const statistics = ref({
-      userCount: 0,
-      milestoneCount: 0,
-      certificateCount: 0,
-      satisfactionRate: 0
+      userCount: 128,
+      milestoneCount: 356,
+      certificateCount: 89,
+      satisfactionRate: 95
     })
 
     const goToMilestones = () => {
@@ -123,10 +109,17 @@ export default {
     }
 
     onMounted(() => {
+      // Get current user from local storage
+      const user = localStorage.getItem('currentUser')
+      if (user) {
+        currentUser.value = JSON.parse(user)
+      }
+      
       loadStatistics()
     })
 
     return {
+      currentUser,
       statistics,
       goToMilestones
     }
