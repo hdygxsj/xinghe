@@ -38,16 +38,38 @@
 
 <script>
 import { ref, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 export default {
   name: 'App',
   setup() {
     const router = useRouter()
+    const route = useRoute()
     const activeIndex = ref('1')
     const isLoggedIn = ref(false)
     const isAdmin = ref(false)
     const currentUser = ref(null)
+
+    // 路径与菜单索引的映射
+    const pathToIndexMap = {
+      '/': '1',
+      '/milestones': '2',
+      '/certificates': '3',
+      '/ai-assistant': '4',
+      '/mentors': '5',
+      '/career-plans': '6',
+      '/skills': '7',
+      '/roles': '8',
+      '/hr-dashboard': '9'
+    }
+
+    // 监听路由变化，更新导航栏
+    watch(() => route.path, (newPath) => {
+      const index = pathToIndexMap[newPath]
+      if (index) {
+        activeIndex.value = index
+      }
+    })
 
     // 检查登录状态
     const checkLoginStatus = () => {
@@ -130,6 +152,11 @@ export default {
 
     onMounted(() => {
       checkLoginStatus()
+      // 初始化时根据当前路由设置活跃菜单
+      const index = pathToIndexMap[route.path]
+      if (index) {
+        activeIndex.value = index
+      }
       window.addEventListener('storage', handleStorageChange)
     })
 

@@ -96,8 +96,8 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="annualDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="confirmGenerateAnnual">生成</el-button>
+          <el-button @click="annualDialogVisible = false" :disabled="generatingAnnual">取消</el-button>
+          <el-button type="primary" @click="confirmGenerateAnnual" :disabled="!annualForm.year || !annualForm.grade || generatingAnnual" :loading="generatingAnnual">{{ generatingAnnual ? '生成中...' : '生成' }}</el-button>
         </span>
       </template>
     </el-dialog>
@@ -110,13 +110,47 @@
     >
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="contactDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="confirmGenerateContact">生成</el-button>
+          <el-button @click="contactDialogVisible = false" :disabled="generatingContact">取消</el-button>
+          <el-button type="primary" @click="confirmGenerateContact" :disabled="generatingContact" :loading="generatingContact">{{ generatingContact ? '生成中...' : '生成' }}</el-button>
         </span>
       </template>
     </el-dialog>
     
-    <!-- 证书查看对话框 -->
+    <!-- 荣誉证明对话框 -->
+    <el-dialog
+      title="生成荣誉证明"
+      v-model="honorDialogVisible"
+      width="600px"
+    >
+      <div class="honor-milestones-container" v-loading="loadingHonors">
+        <el-empty v-if="honorMilestones.length === 0 && !loadingHonors" description="暂无荣誉里程碑" />
+        <el-table
+          v-else
+          :data="honorMilestones"
+          highlight-current-row
+          @select="handleHonorTableSelect"
+          @select-all="handleHonorTableSelectAll"
+          ref="honorTableRef"
+          max-height="400"
+        >
+          <el-table-column type="selection" width="50"></el-table-column>
+          <el-table-column prop="title" label="荣誉标题" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="eventDate" label="获得时间" width="150">
+            <template #default="{ row }">
+              {{ formatDate(row.eventDate) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="description" label="描述" show-overflow-tooltip></el-table-column>
+        </el-table>
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="honorDialogVisible = false" :disabled="generatingHonor">取消</el-button>
+          <el-button type="primary" @click="confirmGenerateHonor" :disabled="!selectedHonor || generatingHonor" :loading="generatingHonor">{{ generatingHonor ? '生成中...' : '生成' }}</el-button>
+        </span>
+      </template>
+    </el-dialog>
+    
     <el-dialog
       title="证书预览"
       v-model="viewDialogVisible"
@@ -159,6 +193,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { getCertificatesByEmployeeId, downloadCertificatePdf } from '@/api/certificate'
 import { generateAnnualAssessmentCertificate, generateEmploymentContactCertificate, generateHonorCertificate } from '@/api/careerInfo'
+import { getMilestonesByEmployeeId } from '@/api/milestone'
 import { ElMessage } from 'element-plus'
 
 export default {
@@ -183,6 +218,13 @@ export default {
       employeeId: null
     })
     const availableYears = ref([])
+    const honorDialogVisible = ref(false)
+    const honorMilestones = ref([])
+    const selectedHonor = ref(null)
+    const loadingHonors = ref(false)
+    const generatingHonor = ref(false)
+    const generatingAnnual = ref(false)
+    const generatingContact = ref(false)
     
     const filteredCertificates = computed(() => {
       if (activeTab.value === 'all') {
@@ -241,7 +283,8 @@ export default {
     }
     
     const generateHonorCertificate = () => {
-      ElMessage.info('请选择一个荣誉里程碑来生成证明')
+      honorDialogVisible.value = true
+      loadHonorMilestones()
     }
     
     const confirmGenerateAnnual = async () => {
@@ -261,16 +304,29 @@ export default {
           return
         }
         
-        await generateAnnualAssessmentCertificate(
+        generatingAnnual.value = true
+        
+        const response = await generateAnnualAssessmentCertificate(
           currentUser.value.id,
           annualForm.value.year,
           annualForm.value.grade
         )
-        ElMessage.success('年度考核证明生成成功')
-        annualDialogVisible.value = false
-        loadCertificates()
+        
+        if (response && response.data) {
+          ElMessage.success('年度考核证明生成成功')
+          annualDialogVisible.value = false
+          annualForm.value.year = ''
+          annualForm.value.grade = 'A'
+          await loadCertificates()
+        } else {
+          ElMessage.error('生成失败：无效的响应数据')
+        }
       } catch (error) {
-        ElMessage.error('生成失败')
+        const errorMessage = error.response?.data?.message || error.message || '生成失败，请稍后重试'
+        ElMessage.error(errorMessage)
+        console.error('生成年度考核证明失败:', error)
+      } finally {
+        generatingAnnual.value = false
       }
     }
     
@@ -281,12 +337,107 @@ export default {
           return
         }
         
-        await generateEmploymentContactCertificate(currentUser.value.id)
-        ElMessage.success('在职联系人证明生成成功')
-        contactDialogVisible.value = false
-        loadCertificates()
+        generatingContact.value = true
+        
+        const response = await generateEmploymentContactCertificate(currentUser.value.id)
+        
+        if (response && response.data) {
+          ElMessage.success('在职联系人证明生成成功')
+          contactDialogVisible.value = false
+          await loadCertificates()
+        } else {
+          ElMessage.error('生成失败：无效的响应数据')
+        }
       } catch (error) {
-        ElMessage.error('生成失败')
+        const errorMessage = error.response?.data?.message || error.message || '生成失败，请稍后重试'
+        ElMessage.error(errorMessage)
+        console.error('生成在职联系人证明失败:', error)
+      } finally {
+        generatingContact.value = false
+      }
+    }
+    
+    const loadHonorMilestones = async () => {
+      try {
+        if (!currentUser.value || !currentUser.value.id) {
+          ElMessage.error('请先登录')
+          return
+        }
+        loadingHonors.value = true
+        const response = await getMilestonesByEmployeeId(currentUser.value.id)
+        // 筛选荣誉类型的里程碑（参赛荣誉）
+        honorMilestones.value = response.data.filter(m => m.type === '参赛荣誉')
+        selectedHonor.value = null
+        loadingHonors.value = false
+      } catch (error) {
+        ElMessage.error('加载荣誉里程碑失败')
+        loadingHonors.value = false
+      }
+    }
+    
+    const handleHonorTableSelect = (selection, row) => {
+      // 处理单行选择：只能选择一行
+      if (selection.length > 0) {
+        // 如果已有选择，则替换为新选择
+        selectedHonor.value = row
+      } else {
+        // 取消选择
+        selectedHonor.value = null
+      }
+    }
+    
+    const handleHonorTableSelectAll = (selection) => {
+      // 处理全选：只保留最后一个
+      if (selection.length > 0) {
+        selectedHonor.value = selection[selection.length - 1]
+      } else {
+        selectedHonor.value = null
+      }
+    }
+    
+    const handleHonorSelection = (row) => {
+      selectedHonor.value = row
+    }
+    
+    const confirmGenerateHonor = async () => {
+      // 验证用户登录状态
+      if (!currentUser.value || !currentUser.value.id) {
+        ElMessage.error('请先登录')
+        return
+      }
+      
+      // 验证是否选择了荣誉
+      if (!selectedHonor.value) {
+        ElMessage.error('请选择一个荣誉里程碑')
+        return
+      }
+      
+      try {
+        generatingHonor.value = true
+        
+        // 调用生成API
+        const response = await generateHonorCertificate(currentUser.value.id, selectedHonor.value.id)
+        
+        // 检查响应是否成功
+        if (response && response.data) {
+          ElMessage.success(`荣誉证明"${selectedHonor.value.title}"生成成功`)
+          
+          // 关闭对话框和重置状态
+          honorDialogVisible.value = false
+          selectedHonor.value = null
+          
+          // 刷新证书列表
+          await loadCertificates()
+        } else {
+          ElMessage.error('生成失败：响应数据异常')
+        }
+      } catch (error) {
+        // 详细的错误处理
+        const errorMessage = error.response?.data?.message || error.message || '生成失败，请稍后重试'
+        ElMessage.error(errorMessage)
+        console.error('生成荣誉证明失败:', error)
+      } finally {
+        generatingHonor.value = false
       }
     }
     
@@ -373,6 +524,7 @@ export default {
       certificates,
       annualDialogVisible,
       contactDialogVisible,
+      honorDialogVisible,
       viewDialogVisible,
       selectedCertificate,
       certificateViewUrl,
@@ -381,6 +533,12 @@ export default {
       annualForm,
       contactForm,
       availableYears,
+      honorMilestones,
+      selectedHonor,
+      loadingHonors,
+      generatingHonor,
+      generatingAnnual,
+      generatingContact,
       filteredCertificates,
       handleTabChange,
       getTagType,
@@ -391,6 +549,10 @@ export default {
       generateHonorCertificate,
       confirmGenerateAnnual,
       confirmGenerateContact,
+      confirmGenerateHonor,
+      handleHonorSelection,
+      handleHonorTableSelect,
+      handleHonorTableSelectAll,
       downloadCertificate: downloadCertificateHandler,
       viewCertificate,
       handleIframeLoad,
@@ -553,6 +715,10 @@ export default {
 .preview-error {
   width: 100%;
   padding: 50px;
+}
+
+.honor-milestones-container {
+  min-height: 200px;
 }
 
 /* 证书预览对话框样式 */
