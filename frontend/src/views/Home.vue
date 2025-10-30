@@ -793,6 +793,7 @@ export default {
   padding: 40px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   margin-bottom: 40px;
+  margin-top: 80px;
   border: 1px solid rgba(102, 126, 234, 0.1);
 }
 

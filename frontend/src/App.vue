@@ -162,7 +162,7 @@ export default {
 .logo {
   font-size: 24px;
   font-weight: bold;
-  color: #ff6b35;
+  color: #1d54c1;
 }
 
 .nav {
