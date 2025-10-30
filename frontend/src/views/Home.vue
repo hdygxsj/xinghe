@@ -141,8 +141,7 @@ import { useRouter } from 'vue-router'
 import { getStatisticsByEmployeeId } from '@/api/careerInfo'
 import { getRecentActivities } from '@/api/activity'
 import { ElMessage } from 'element-plus'
-import { Document, Medal, Lightning, User } from '@element-plus/icons-vue'
-import { Document, Medal, Lightning, TrendCharts } from '@element-plus/icons-vue'
+import { Document, Medal, Lightning, User, TrendCharts } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 
 export default {
@@ -151,6 +150,7 @@ export default {
     Document,
     Medal,
     Lightning,
+    User,
     TrendCharts
   },
   setup() {
@@ -337,7 +337,7 @@ export default {
       certificateChart,
       goToMilestones,
       goToCertificates,
-      goToRoles
+      goToRoles,
       goToAI,
       goToCareerPlans,
       getActivityType,
