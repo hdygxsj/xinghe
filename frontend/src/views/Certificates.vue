@@ -103,12 +103,35 @@
         </span>
       </template>
     </el-dialog>
+    
+    <!-- 证书查看对话框 -->
+    <el-dialog
+      title="证书详情"
+      v-model="viewDialogVisible"
+      width="500px"
+    >
+      <div v-if="selectedCertificate">
+        <el-descriptions :column="1" border>
+          <el-descriptions-item label="证书标题">{{ selectedCertificate.title }}</el-descriptions-item>
+          <el-descriptions-item label="证书类型">{{ selectedCertificate.certificateType }}</el-descriptions-item>
+          <el-descriptions-item label="颁发日期">{{ formatDate(selectedCertificate.issueDate) }}</el-descriptions-item>
+          <el-descriptions-item label="颁发机构">{{ selectedCertificate.issuer }}</el-descriptions-item>
+          <el-descriptions-item label="描述">{{ selectedCertificate.description }}</el-descriptions-item>
+        </el-descriptions>
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="viewDialogVisible = false">关闭</el-button>
+          <el-button type="primary" @click="downloadCertificate(selectedCertificate)">下载</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { ref, computed, onMounted } from 'vue'
-import { getCertificates } from '@/api/certificate'
+import { getCertificates, downloadCertificate } from '@/api/certificate'
 import { generateAnnualAssessmentCertificate, generateEmploymentContactCertificate, generateHonorCertificate } from '@/api/careerInfo'
 import { ElMessage } from 'element-plus'
 
@@ -119,6 +142,8 @@ export default {
     const certificates = ref([])
     const annualDialogVisible = ref(false)
     const contactDialogVisible = ref(false)
+    const viewDialogVisible = ref(false)
+    const selectedCertificate = ref(null)
     const annualForm = ref({
       employeeId: '',
       year: ''
@@ -193,42 +218,27 @@ export default {
       }
     }
     
-    const downloadCertificate = (certificate) => {
-      // 模拟下载证书
-      if (certificate.certificateUrl) {
-        // 如果有证书URL，则下载文件
-        const link = document.createElement('a')
-        link.href = certificate.certificateUrl
-        link.download = `${certificate.title}.pdf`
-        link.click()
-        ElMessage.success(`开始下载证书: ${certificate.title}`)
-      } else {
-        // 如果没有证书URL，则提供模拟下载
-        const content = `证书标题: ${certificate.title}
-证书类型: ${certificate.certificateType}
-颁发日期: ${formatDate(certificate.issueDate)}
-颁发机构: ${certificate.issuer}
-描述: ${certificate.description}`
-        const blob = new Blob([content], { type: 'text/plain' })
-        const url = window.URL.createObjectURL(blob)
+    const downloadCertificateHandler = async (certificate) => {
+      try {
+        const response = await downloadCertificate(certificate.id)
+        // 创建下载链接
+        const url = window.URL.createObjectURL(new Blob([response.data]))
         const link = document.createElement('a')
         link.href = url
-        link.download = `${certificate.title}.txt`
+        link.setAttribute('download', `${certificate.title}.txt`)
+        document.body.appendChild(link)
         link.click()
+        link.remove()
         window.URL.revokeObjectURL(url)
-        ElMessage.success(`开始下载证书: ${certificate.title}`)
+        ElMessage.success(`证书下载成功: ${certificate.title}`)
+      } catch (error) {
+        ElMessage.error('下载失败')
       }
     }
     
     const viewCertificate = (certificate) => {
-      // 模拟查看证书
-      if (certificate.certificateUrl) {
-        // 如果有证书URL，则在新窗口中打开
-        window.open(certificate.certificateUrl, '_blank')
-      } else {
-        // 如果没有证书URL，则显示证书信息
-        ElMessage.info(`证书信息: ${certificate.title} - ${certificate.description}`)
-      }
+      selectedCertificate.value = certificate
+      viewDialogVisible.value = true
     }
     
     const loadCertificates = async () => {
@@ -256,6 +266,8 @@ export default {
       certificates,
       annualDialogVisible,
       contactDialogVisible,
+      viewDialogVisible,
+      selectedCertificate,
       annualForm,
       contactForm,
       availableYears,
@@ -267,7 +279,7 @@ export default {
       generateHonorCertificate,
       confirmGenerateAnnual,
       confirmGenerateContact,
-      downloadCertificate,
+      downloadCertificate: downloadCertificateHandler,
       viewCertificate,
       formatDate,
       loadCertificates

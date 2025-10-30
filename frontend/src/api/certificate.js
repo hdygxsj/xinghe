@@ -31,3 +31,12 @@ export const updateCertificate = (id, certificate) => {
 export const deleteCertificate = (id) => {
   return axios.delete(`${BASE_URL}/${id}`)
 }
+
+// 下载证书
+export const downloadCertificate = (id) => {
+  return axios({
+    method: 'GET',
+    url: `${BASE_URL}/${id}/download`,
+    responseType: 'blob'
+  })
+}
