@@ -332,7 +332,32 @@ export default {
                 { name: '专业技能', max: 10 },
                 { name: '语言技能', max: 10 },
                 { name: '管理技能', max: 10 }
-              ]
+              ],
+              radius: '65%',
+              center: ['50%', '55%'],
+              splitNumber: 4,
+              axisName: {
+                color: '#666',
+                fontSize: 12
+              },
+              splitLine: {
+                lineStyle: {
+                  color: '#e0e0e0',
+                  width: 1
+                }
+              },
+              splitArea: {
+                show: true,
+                areaStyle: {
+                  color: ['rgba(255, 255, 255, 0.9)', 'rgba(245, 245, 245, 0.9)']
+                }
+              },
+              axisLine: {
+                lineStyle: {
+                  color: '#e0e0e0',
+                  width: 1
+                }
+              }
             },
             series: [{
               type: 'radar',
@@ -344,7 +369,21 @@ export default {
                   skillStats.skillTypeCount['语言技能'] || 0,
                   skillStats.skillTypeCount['管理技能'] || 0
                 ],
-                name: '技能评分'
+                name: '技能评分',
+                symbol: 'circle',
+                symbolSize: 6,
+                lineStyle: {
+                  width: 2,
+                  color: '#ff6b35'
+                },
+                itemStyle: {
+                  color: '#ff6b35',
+                  borderColor: '#fff',
+                  borderWidth: 2
+                },
+                areaStyle: {
+                  color: 'rgba(255, 107, 53, 0.25)'
+                }
               }]
             }]
           }
@@ -366,7 +405,27 @@ export default {
                 { name: '专业技能', max: 10 },
                 { name: '语言技能', max: 10 },
                 { name: '管理技能', max: 10 }
-              ]
+              ],
+              radius: '60%',
+              center: ['50%', '55%'],
+              splitNumber: 5,
+              axisName: {
+                color: '#666',
+                fontSize: 12
+              },
+              splitLine: {
+                lineStyle: {
+                  color: '#ddd'
+                }
+              },
+              splitArea: {
+                show: false
+              },
+              axisLine: {
+                lineStyle: {
+                  color: '#ddd'
+                }
+              }
             },
             series: [{
               type: 'radar',
@@ -378,7 +437,21 @@ export default {
                   Math.min(statistics.value.skillCount * 0.15, 10),
                   Math.min(statistics.value.skillCount * 0.1, 10)
                 ],
-                name: '技能评分'
+                name: '技能评分',
+                symbol: 'circle',
+                symbolSize: 6,
+                lineStyle: {
+                  width: 2,
+                  color: '#ff6b35'
+                },
+                itemStyle: {
+                  color: '#ff6b35',
+                  borderColor: '#fff',
+                  borderWidth: 2
+                },
+                areaStyle: {
+                  color: 'rgba(255, 107, 53, 0.25)'
+                }
               }]
             }]
           }
@@ -579,7 +652,7 @@ export default {
 
 .chart-container {
   width: 100%;
-  height: 300px;
+  height: 320px; /* 增加高度以更好地显示雷达图 */
 }
 
 .recent-activity {
