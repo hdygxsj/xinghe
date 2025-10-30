@@ -15,11 +15,11 @@
       ></el-tab-pane>
     </el-tabs>
 
-    <el-table :data="filteredSkills" style="width: 100%" v-loading="loading">
-      <el-table-column prop="skillName" label="技能名称" width="200"></el-table-column>
-      <el-table-column prop="skillCategory" label="分类" width="120"></el-table-column>
-      <el-table-column prop="skillDescription" label="描述" width="300"></el-table-column>
-      <el-table-column label="熟练度" width="120">
+    <el-table :data="filteredSkills" style="width: 100%" v-loading="loading" class="full-width-table">
+      <el-table-column prop="skillName" label="技能名称" min-width="200"></el-table-column>
+      <el-table-column prop="skillCategory" label="分类" min-width="120"></el-table-column>
+      <el-table-column prop="skillDescription" label="描述" min-width="300"></el-table-column>
+      <el-table-column label="熟练度" min-width="120">
         <template #default="scope">
           <el-rate
             v-model="scope.row.proficiencyLevel"
@@ -30,12 +30,12 @@
           ></el-rate>
         </template>
       </el-table-column>
-      <el-table-column label="获得日期" width="120">
+      <el-table-column label="获得日期" min-width="120">
         <template #default="scope">
           {{ formatDate(scope.row.acquiredDate) }}
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="200">
+      <el-table-column label="操作" fixed="right" min-width="200">
         <template #default="scope">
           <el-button size="small" @click="editSkill(scope.row)">编辑</el-button>
           <el-button size="small" type="danger" @click="deleteSkill(scope.row.id)">删除</el-button>
@@ -300,5 +300,23 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+}
+
+.full-width-table {
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .header-section {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+  
+  .full-width-table :deep(.el-table__column) {
+    padding: 5px 0;
+  }
 }
 </style>

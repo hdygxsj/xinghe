@@ -12,27 +12,27 @@
       <el-tab-pane label="已完成" name="COMPLETED"></el-tab-pane>
     </el-tabs>
 
-    <el-table :data="filteredPlans" style="width: 100%" v-loading="loading">
-      <el-table-column prop="title" label="规划标题" width="200"></el-table-column>
-      <el-table-column prop="targetPosition" label="目标职位" width="150"></el-table-column>
-      <el-table-column label="目标日期" width="120">
+    <el-table :data="filteredPlans" style="width: 100%" v-loading="loading" class="full-width-table">
+      <el-table-column prop="title" label="规划标题" min-width="200"></el-table-column>
+      <el-table-column prop="targetPosition" label="目标职位" min-width="150"></el-table-column>
+      <el-table-column label="目标日期" min-width="120">
         <template #default="scope">
           {{ formatDate(scope.row.targetDate) }}
         </template>
       </el-table-column>
-      <el-table-column label="状态" width="100">
+      <el-table-column label="状态" min-width="100">
         <template #default="scope">
           <el-tag :type="getStatusTagType(scope.row.status)">
             {{ getStatusText(scope.row.status) }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" width="120">
+      <el-table-column label="创建时间" min-width="120">
         <template #default="scope">
           {{ formatDate(scope.row.createTime) }}
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="200">
+      <el-table-column label="操作" fixed="right" min-width="200">
         <template #default="scope">
           <el-button size="small" @click="viewPlan(scope.row)">查看</el-button>
           <el-button size="small" @click="editPlan(scope.row)">编辑</el-button>
@@ -295,5 +295,23 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+}
+
+.full-width-table {
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .header-section {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+  
+  .full-width-table :deep(.el-table__column) {
+    padding: 5px 0;
+  }
 }
 </style>

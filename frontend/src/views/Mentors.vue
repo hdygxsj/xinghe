@@ -13,24 +13,24 @@
 
     <!-- 我的导师列表 -->
     <div v-if="activeTab === 'mentors'">
-      <el-table :data="myMentors" style="width: 100%" v-loading="loading">
-        <el-table-column prop="mentorName" label="导师姓名" width="120"></el-table-column>
-        <el-table-column prop="mentorDepartment" label="部门" width="150"></el-table-column>
-        <el-table-column prop="mentorPosition" label="职位" width="150"></el-table-column>
-        <el-table-column prop="mentorExpertise" label="专长" width="200"></el-table-column>
-        <el-table-column label="状态" width="100">
+      <el-table :data="myMentors" style="width: 100%" v-loading="loading" class="full-width-table">
+        <el-table-column prop="mentorName" label="导师姓名" min-width="120"></el-table-column>
+        <el-table-column prop="mentorDepartment" label="部门" min-width="150"></el-table-column>
+        <el-table-column prop="mentorPosition" label="职位" min-width="150"></el-table-column>
+        <el-table-column prop="mentorExpertise" label="专长" min-width="200"></el-table-column>
+        <el-table-column label="状态" min-width="100">
           <template #default="scope">
             <el-tag :type="getMentorshipStatusType(scope.row.status)">
               {{ getMentorshipStatusText(scope.row.status) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="开始日期" width="120">
+        <el-table-column label="开始日期" min-width="120">
           <template #default="scope">
             {{ formatDate(scope.row.startDate) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150">
+        <el-table-column label="操作" fixed="right" min-width="150">
           <template #default="scope">
             <el-button size="small" @click="viewMentorship(scope.row)">查看详情</el-button>
           </template>
@@ -40,23 +40,23 @@
 
     <!-- 我的学员列表 -->
     <div v-if="activeTab === 'mentees'">
-      <el-table :data="myMentees" style="width: 100%" v-loading="loading">
-        <el-table-column prop="menteeName" label="学员姓名" width="120"></el-table-column>
-        <el-table-column prop="menteeDepartment" label="部门" width="150"></el-table-column>
-        <el-table-column prop="menteePosition" label="职位" width="150"></el-table-column>
-        <el-table-column label="状态" width="100">
+      <el-table :data="myMentees" style="width: 100%" v-loading="loading" class="full-width-table">
+        <el-table-column prop="menteeName" label="学员姓名" min-width="120"></el-table-column>
+        <el-table-column prop="menteeDepartment" label="部门" min-width="150"></el-table-column>
+        <el-table-column prop="menteePosition" label="职位" min-width="150"></el-table-column>
+        <el-table-column label="状态" min-width="100">
           <template #default="scope">
             <el-tag :type="getMentorshipStatusType(scope.row.status)">
               {{ getMentorshipStatusText(scope.row.status) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="开始日期" width="120">
+        <el-table-column label="开始日期" min-width="120">
           <template #default="scope">
             {{ formatDate(scope.row.startDate) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150">
+        <el-table-column label="操作" fixed="right" min-width="150">
           <template #default="scope">
             <el-button size="small" @click="viewMentorship(scope.row)">查看详情</el-button>
           </template>
@@ -66,13 +66,13 @@
 
     <!-- 所有导师列表 -->
     <div v-if="activeTab === 'all'">
-      <el-table :data="allMentors" style="width: 100%" v-loading="loading">
-        <el-table-column prop="name" label="姓名" width="120"></el-table-column>
-        <el-table-column prop="department" label="部门" width="150"></el-table-column>
-        <el-table-column prop="position" label="职位" width="150"></el-table-column>
-        <el-table-column prop="expertise" label="专长" width="200"></el-table-column>
-        <el-table-column prop="email" label="邮箱" width="200"></el-table-column>
-        <el-table-column label="操作" width="150">
+      <el-table :data="allMentors" style="width: 100%" v-loading="loading" class="full-width-table">
+        <el-table-column prop="name" label="姓名" min-width="120"></el-table-column>
+        <el-table-column prop="department" label="部门" min-width="150"></el-table-column>
+        <el-table-column prop="position" label="职位" min-width="150"></el-table-column>
+        <el-table-column prop="expertise" label="专长" min-width="200"></el-table-column>
+        <el-table-column prop="email" label="邮箱" min-width="200"></el-table-column>
+        <el-table-column label="操作" fixed="right" min-width="150">
           <template #default="scope">
             <el-button size="small" @click="applyForMentor(scope.row)">申请指导</el-button>
           </template>
@@ -370,5 +370,23 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+}
+
+.full-width-table {
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .header-section {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+  
+  .full-width-table :deep(.el-table__column) {
+    padding: 5px 0;
+  }
 }
 </style>
